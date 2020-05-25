@@ -12,10 +12,24 @@ namespace Lab4Web_QuizApp.Data
 {
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+
+
         public ApplicationDbContext(
             DbContextOptions options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Question>()
+                .HasMany(a => a.AnswerOptions)
+                .WithOne(q => q.Question)
+                .HasForeignKey(q => q.QuestionId);
         }
     }
 }
