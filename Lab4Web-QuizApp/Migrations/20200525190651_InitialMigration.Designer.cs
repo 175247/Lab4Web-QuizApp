@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200525112908_AddQuestionsAndAnswers")]
-    partial class AddQuestionsAndAnswers
+    [Migration("20200525190651_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -343,7 +343,7 @@ namespace Lab4Web_QuizApp.Migrations
 
             modelBuilder.Entity("Lab4Web_QuizApp.Models.Answer", b =>
                 {
-                    b.HasOne("Lab4Web_QuizApp.Models.Question", "Question")
+                    b.HasOne("Lab4Web_QuizApp.Models.Question", null)
                         .WithMany("AnswerOptions")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
