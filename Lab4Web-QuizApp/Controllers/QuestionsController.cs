@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
@@ -13,10 +14,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Route("[controller]")]
+    [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
     {
@@ -27,7 +30,6 @@ namespace Lab4Web_QuizApp.Controllers
         }
 
         [HttpGet]
-        [Route("/questions")]
         public async Task<IActionResult> Get()
         {
             if (_context.Database.CanConnect())
@@ -43,12 +45,12 @@ namespace Lab4Web_QuizApp.Controllers
 
                     var response = Enumerable.Range(0, questions.Count())
                         .Select(index => new QuestionResponse
-                    {
-                        RequestTime = DateTime.Now,
-                        Id = questions[index].Id,
-                        QuestionString = questions[index].QuestionString,
-                        AnswerOptions = questions[index].AnswerOptions
-                    })
+                        {
+                            RequestTime = DateTime.Now,
+                            Id = questions[index].Id,
+                            QuestionString = questions[index].QuestionString,
+                            AnswerOptions = questions[index].AnswerOptions
+                        })
                     .ToArray();
 
                     return Ok(response);

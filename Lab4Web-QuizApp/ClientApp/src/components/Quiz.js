@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-//import quizData from "../data/quizData"
 import Question from "./Question"
 
 class Quiz extends Component {
@@ -36,8 +35,10 @@ class Quiz extends Component {
         this.fetchData();
     }
 
-    async fetchData() {
-        await fetch('questions')
+    async fetchData(id) {
+        await fetch('questions', {
+            method: 'GET'
+        })
             .then(response => response.json())
             .then(data => {
                 this.setState({
@@ -74,6 +75,7 @@ class Quiz extends Component {
             />
         let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
         let answerStatus = this.state.invalidAnswer ? <h1>Damn son, wrong answer...</h1> : null
+
         return (
             <div>
                 {loadingCheck}
