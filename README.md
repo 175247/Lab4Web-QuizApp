@@ -1,17 +1,30 @@
 (done) 1. -> Create a question model in VS matching the React question model (quizData in src/data)
+
 (done) 2. -> Create an answer model in VS as per above
+
 (done) 3. -> Create a new HTTP Folder in Models in VS.
+
 (done)	3.1 -> Create a question request model som kommer se ut som den datan man skickar in/med när man anropar APIet
-(done)		(request = när man anropar APIet. Bl.a. kan en summary skickas tom (00:35:15 routing del 2, läs längre ner i detta dokument)
+		(request = när man anropar APIet med data från t.ex. en form, genom put/post)
+
 (done)	3.2 -> Create a question (response?) model som skickas tillbaka från APIet, som blir som en kopia av databasmodellen
+
 (done)	3.3 -> Do the same for the answer model
+
 (done) 4. -> Create the database and seed it with the two questions in the quizData. Answer has to have Id too and questionId.
+
 (done) 5. -> Create a question controller.
+
 (done)	5.1 -> Allow use of the question model and HTTP Models
+
 (done)	5.2 -> Get data from the database.
+
 (done)	5.3 -> Return it as Json.
+
 (done) 6. -> Find out how to call the API from React
+
 (done) 7. -> Create Component/function in React that calls the API
+
 (done)	7.1 -> Store data in state and display as per usual.
 	7.2 -> Create an actual seeding method in C# in dbContext or elsewhere when time allows (this can be down prioritised).
 
