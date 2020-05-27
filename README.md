@@ -30,17 +30,17 @@
 
 8. -> Read up routing, link at the top of this document.
 
-9. -> When all of the above works, check how to best follow the REST API standard and setting response header/body etc.
+(done) 9. -> When all of the above works, check how to best follow the REST API standard and setting response header/body etc.
 	
-	9.1 -> Check how to set data in the response header.
+(done)	9.1 -> Check how to set data in the response header.
 	
-	9.2 -> Check how to set data in the response body.
+(done)	9.2 -> Check how to set data in the response body.
 	
-	9.3 -> Implement it.
+(done)	9.3 -> Implement it.
 
 10. -> Create a post-route and component where user, in a form, enters a question, then page changes to add 4 answers (and set a radio button on the correct one or something like that), use routing and push to history.
 
-10.1 -> Call a post API and send the [FormBody]. Add it to the database.
+10.1 -> Call a post API and send the [FromBody]. Add it to the database.
 
 11. -> Create a component to log in with, send a post request to the controller api, check login credentials -
 		If the credentials are OK, send an ok request and success-status. If success, proceed. else show error etc.
