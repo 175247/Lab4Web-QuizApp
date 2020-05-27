@@ -7,8 +7,7 @@ namespace Lab4Web_QuizApp.Models.HTTP
 {
     public class QuestionRequest
     {
-        public int Id { get; set; }
         public string QuestionString { get; set; }
-        public virtual ICollection<Answer> AnswerOptions { get; set; }
+        public virtual List<Answer> AnswerOptions { get; set; }
     }
 }

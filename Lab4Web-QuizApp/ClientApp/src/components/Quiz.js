@@ -35,7 +35,7 @@ class Quiz extends Component {
         this.fetchData();
     }
 
-    async fetchData(id) {
+    async fetchData() {
         await fetch('questions', {
             method: 'GET'
         })
