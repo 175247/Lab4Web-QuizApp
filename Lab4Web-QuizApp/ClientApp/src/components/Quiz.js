@@ -8,13 +8,17 @@ class Quiz extends Component {
             index: 0,
             invalidAnswer: false,
             isCorrectAnswer: false,
-            isLoading: true,
+            //            isLoading: true,
             score: 0,
             questionData: [],
             quizComplete: false,
-            message: ""
+            message: "",
+            seedStatus: "",
+            playable: false
         }
         this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
+        this.seedDatabase = this.seedDatabase.bind(this)
+        // this.renderQuiz = this.renderQuiz.bind(this)
     }
 
     handleAnswerSelection(selectedAnswer) {
@@ -35,7 +39,7 @@ class Quiz extends Component {
         this.fetchData();
     }
 
-    async fetchData(id) {
+    async fetchData() {
         await fetch('questions', {
             method: 'GET'
         })
@@ -43,8 +47,25 @@ class Quiz extends Component {
             .then(data => {
                 this.setState({
                     questionData: data,
-                    isLoading: false
+                    //                    isLoading: false
                 })
+            });
+    }
+
+    async seedDatabase() {
+        await fetch('database', {
+            method: 'PUT'
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        seedStatus: data.description
+                    })
+                } else {
+                    this.setState({
+                        seedStatus: data.description
+                    })
+                }
             });
     }
 
@@ -68,13 +89,18 @@ class Quiz extends Component {
     render() {
         let index = this.state.index
         let data = this.state.questionData[index]
-        let content = this.state.quizComplete ? <p>Well done, bitch!</p>
-            : <Question
+
+        let content = this.state.quizComplete ?
+            <p>Well done, bitch!</p> : <Question
                 question={data}
                 handler={this.handleAnswerSelection}
             />
-        let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
-        let answerStatus = this.state.invalidAnswer ? <h1>Damn son, wrong answer...</h1> : null
+        //let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
+        let loadingCheck = this.state.questionData.length < 1 ?
+            <h1>Loading... hold tight!</h1> : content
+
+        let answerStatus = this.state.invalidAnswer ?
+            <h1>Damn son, wrong answer...</h1> : null
 
         return (
             <div>
@@ -83,7 +109,6 @@ class Quiz extends Component {
             </div>
         )
     }
-
 }
 
 export default Quiz

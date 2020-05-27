@@ -29,8 +29,23 @@ namespace Lab4Web_QuizApp.Controllers
             _context = context;
         }
 
+        public QuestionResponse[] GenerateQuestionResponse(List<Question> question)
+        {
+            var response = Enumerable.Range(0, question.Count())
+                        .Select(index => new QuestionResponse
+                        {
+                            RequestTime = DateTime.Now,
+                            Id = question[index].Id,
+                            QuestionString = question[index].QuestionString,
+                            AnswerOptions = question[index].AnswerOptions
+                        })
+                    .ToArray();
+
+            return response;
+        }
+
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll()
         {
             if (_context.Database.CanConnect())
             {
@@ -43,15 +58,16 @@ namespace Lab4Web_QuizApp.Controllers
                         return NoContent();
                     }
 
-                    var response = Enumerable.Range(0, questions.Count())
-                        .Select(index => new QuestionResponse
-                        {
-                            RequestTime = DateTime.Now,
-                            Id = questions[index].Id,
-                            QuestionString = questions[index].QuestionString,
-                            AnswerOptions = questions[index].AnswerOptions
-                        })
-                    .ToArray();
+                    var response = GenerateQuestionResponse(questions);
+                    //var response = Enumerable.Range(0, questions.Count())
+                    //    .Select(index => new QuestionResponse
+                    //    {
+                    //        RequestTime = DateTime.Now,
+                    //        Id = questions[index].Id,
+                    //        QuestionString = questions[index].QuestionString,
+                    //        AnswerOptions = questions[index].AnswerOptions
+                    //    })
+                    //.ToArray();
 
                     return Ok(response);
                 }
@@ -67,7 +83,54 @@ namespace Lab4Web_QuizApp.Controllers
                     message = "The database is currently unavailable."
                 });
             }
-
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
+        {
+            // Make validation in React to check input.
+            // Need to make sure that all fields have text in them and at least one is selected as the correct answer.
+            //var requestAnswerOptions = Enumerable.Range(0, request.AnswerOptions.Count())
+            //            .Select(index => new Answer
+            //            {
+            //                AnswerString = request.AnswerOptions[index].AnswerString,
+            //                IsCorrectAnswer = request.AnswerOptions[index].IsCorrectAnswer
+            //            });
+
+            var question = new Question
+            {
+                QuestionString = request.QuestionString,
+                AnswerOptions = Enumerable.Range(0, request.AnswerOptions.Count())
+                        .Select(index => new Answer
+                        {
+                            AnswerString = request.AnswerOptions[index].AnswerString,
+                            IsCorrectAnswer = request.AnswerOptions[index].IsCorrectAnswer
+                        })
+            };
+
+            try
+            {
+                await _context.Questions.AddAsync(question);
+                await _context.SaveChangesAsync();
+
+                int newQuestionId = question.Id;
+                var questions = new List<Question>() {
+                    question
+                };
+
+                var response = GenerateQuestionResponse(questions);
+
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "The database is currently unavailable.",
+                    Description = exception.InnerException
+                });
+            }
+        }
+
     }
 }
