@@ -7,7 +7,7 @@ import { Counter } from './components/Counter';
 import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import { ApplicationPaths } from './components/api-authorization/ApiAuthorizationConstants';
-import Quiz from "./components/Quiz.js"
+import QuizStart from "./components/QuizStart"
 
 import './custom.css'
 
@@ -21,7 +21,8 @@ export default class App extends Component {
         <Route path='/counter' component={Counter} />
         <AuthorizeRoute path='/fetch-data' component={FetchData} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
-        <Quiz />
+        <QuizStart />
+        <Route path='/Quiz' />
       </Layout>
     );
   }
