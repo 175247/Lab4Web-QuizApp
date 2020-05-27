@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import quizData from "../data/quizData"
 import Question from "./Question"
 
 class Quiz extends Component {
@@ -7,47 +6,46 @@ class Quiz extends Component {
         super()
         this.state = {
             index: 0,
+            invalidAnswer: false,
             isCorrectAnswer: false,
+            isLoading: true,
             score: 0,
-            questionData: [],//this.fetchData,//quizData,
+            questionData: [],
             quizComplete: false,
             message: ""
         }
         this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
     }
 
-    //fetchData() {
-    //    fetch("localhost:3000/https://localhost:questions/all")
-    //        .then(response => response.json())
-    //        .then(data =>
-    //            this.setState({ questionData: data }))
-    //}
-    handleAnswerSelection(question, answer) {
-        if (answer === question.correctAnswer) {
+    handleAnswerSelection(selectedAnswer) {
+        if (selectedAnswer.isCorrectAnswer === true) {
             this.setState({
-                isCorrectAnswer: true
+                isCorrectAnswer: true,
+                invalidAnswer: false
             })
             this.loadQuestion()
         } else {
-            // THIS DOES NOT WORK!
-            //return (
-            //    <div>
-            //        <h1>Derp out! 300 points! Not.</h1>
-            //    </div>
-            //)
+            this.setState({
+                invalidAnswer: true
+            })
         }
     }
 
     componentDidMount() {
-        //this.setState({
-        //    questionData: quizData
-        //})
-        fetch('question')
+        this.fetchData();
+    }
+
+    async fetchData(id) {
+        await fetch('questions', {
+            method: 'GET'
+        })
             .then(response => response.json())
-            .then(data =>
+            .then(data => {
                 this.setState({
-                    message: data
-                }));
+                    questionData: data,
+                    isLoading: false
+                })
+            });
     }
 
     loadQuestion() {
@@ -61,7 +59,8 @@ class Quiz extends Component {
         } else {
             this.setState(previousState => ({
                 index: previousState.index + 1,
-                isCorrectAnswer: false
+                isCorrectAnswer: false,
+                invalidAnswer: false
             }))
         }
     }
@@ -69,18 +68,19 @@ class Quiz extends Component {
     render() {
         let index = this.state.index
         let data = this.state.questionData[index]
-        let content = this.state.message
-        //let content = this.state.quizComplete ? <p>Well done, bitch!</p>
-        //    : <Question
-        //        question={data}
-        //        handler={this.handleAnswerSelection}
-        //    />
+        let content = this.state.quizComplete ? <p>Well done, bitch!</p>
+            : <Question
+                question={data}
+                handler={this.handleAnswerSelection}
+            />
+        let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
+        let answerStatus = this.state.invalidAnswer ? <h1>Damn son, wrong answer...</h1> : null
 
         return (
             <div>
-                {content}
+                {loadingCheck}
+                {answerStatus}
             </div>
-            //<Question data={this.state.questionData[this.state.index]} />
         )
     }
 

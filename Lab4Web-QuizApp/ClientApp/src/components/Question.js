@@ -8,17 +8,20 @@ function Question(props) {
     // Also... try to make the button logic below "better" Great job at making it work though!
     // Now just improve it. :)
 
+    //{ console.log(props.question) }
     return (
         <div>
-            <p>{props.question.questionText}</p>
-            {props.question.answerOptions.map(answer => (
-                <button className="btn btn-primary"
-                    key={answer}
-                    onClick={() => props.handler(props.question, answer)}
-                >
-                    {answer}
-                </button>
-            ))}
+            <p>{props.question.questionString}</p>
+            {
+                props.question.answerOptions.map(answer => (
+                    <button className="btn btn-primary"
+                        key={answer.id}
+                        onClick={() => props.handler(answer)}
+                    >
+                        {answer.answerString}
+                    </button>
+                ))
+            }
         </div>
     )
 }
