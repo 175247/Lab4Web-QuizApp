@@ -8,7 +8,7 @@ class Quiz extends Component {
             index: 0,
             invalidAnswer: false,
             isCorrectAnswer: false,
-            isLoading: true,
+            //            isLoading: true,
             score: 0,
             questionData: [],
             quizComplete: false,
@@ -43,7 +43,7 @@ class Quiz extends Component {
             .then(data => {
                 this.setState({
                     questionData: data,
-                    isLoading: false
+                    //                    isLoading: false
                 })
             });
     }
@@ -73,7 +73,8 @@ class Quiz extends Component {
                 question={data}
                 handler={this.handleAnswerSelection}
             />
-        let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
+        //let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
+        let loadingCheck = this.state.questionData.length < 1 ? <h1>Loading... hold tight!</h1> : content
         let answerStatus = this.state.invalidAnswer ? <h1>Damn son, wrong answer...</h1> : null
 
         return (
