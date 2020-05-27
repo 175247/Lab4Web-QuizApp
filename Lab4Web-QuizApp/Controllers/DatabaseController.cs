@@ -14,11 +14,11 @@ namespace Lab4Web_QuizApp.Controllers
 {
     [Route("database")]
     [ApiController]
-    public class Database : ControllerBase
+    public class DatabaseController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public Database(ApplicationDbContext context)
+        public DatabaseController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -73,7 +73,7 @@ namespace Lab4Web_QuizApp.Controllers
             };
             if (questionBank.Count() > 0 && questionBank.Count() <= questions.Count())
             {
-                return StatusCode(StatusCodes.Status208AlreadyReported, new
+                return Ok(new
                 {
                     success = true,
                     description = "The database is already seeded."

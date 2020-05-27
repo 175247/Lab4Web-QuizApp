@@ -2,22 +2,17 @@ import React, { Component } from "react"
 import Question from "./Question"
 
 class Quiz extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             index: 0,
             invalidAnswer: false,
             isCorrectAnswer: false,
-            //            isLoading: true,
             score: 0,
-            questionData: [],
+            questionData: props.questions,
             quizComplete: false,
-            message: "",
-            seedStatus: "",
-            playable: false
         }
         this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
-        this.seedDatabase = this.seedDatabase.bind(this)
         // this.renderQuiz = this.renderQuiz.bind(this)
     }
 
@@ -33,40 +28,6 @@ class Quiz extends Component {
                 invalidAnswer: true
             })
         }
-    }
-
-    componentDidMount() {
-        this.fetchData();
-    }
-
-    async fetchData() {
-        await fetch('questions', {
-            method: 'GET'
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    questionData: data,
-                    //                    isLoading: false
-                })
-            });
-    }
-
-    async seedDatabase() {
-        await fetch('database', {
-            method: 'PUT'
-        }).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.setState({
-                        seedStatus: data.description
-                    })
-                } else {
-                    this.setState({
-                        seedStatus: data.description
-                    })
-                }
-            });
     }
 
     loadQuestion() {
@@ -95,16 +56,13 @@ class Quiz extends Component {
                 question={data}
                 handler={this.handleAnswerSelection}
             />
-        //let loadingCheck = this.state.isLoading ? <h1>Loading... hold tight!</h1> : content
-        let loadingCheck = this.state.questionData.length < 1 ?
-            <h1>Loading... hold tight!</h1> : content
 
         let answerStatus = this.state.invalidAnswer ?
             <h1>Damn son, wrong answer...</h1> : null
 
         return (
             <div>
-                {loadingCheck}
+                {content}
                 {answerStatus}
             </div>
         )
