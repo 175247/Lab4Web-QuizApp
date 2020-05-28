@@ -38,24 +38,25 @@
 	
 (done)	9.3 -> Implement it.
 
-10. -> Create a post-route and component where user, in a form, enters a question, then page changes to add 4 answers (and set a radio button on the correct one or something like that), use routing and push to history.
+10. -> Create a post-route and component where user, in a form, enters a question, then (not needed) page changes to add 4 answers (and set a radio button on the correct one or something like that), use routing and push to history.
 
 10.1 -> Call a post API and send the [FromBody]. Add it to the database.
 
-11. -> Create a component to log in with, send a post request to the controller api, check login credentials -
+(not needed) 11. -> Create a component to log in with, send a post request to the controller api, check login credentials -
 		If the credentials are OK, send an ok request and success-status. If success, proceed. else show error etc.
 		Inject the userManager/SignIn-manager in the controller and make requests as such.
 
-11.1 Create a registration with post etc. Remember to check if the user already exists in the api. Similar to the sign in.
+(not needed) 11.1 Create a registration with post etc. Remember to check if the user already exists in the api. Similar to the sign in.
 
-12. -> Create the admin role.
+(done) 12. -> Create the admin role.
 
 12.1 -> Restrict adding questions to only allow users with the admin role to do it.
 
-12. -> Check the G and VG criterias.
+13. -> Add HighScore component in front end and model + return in controller/backend.
+14. -> Check the G and VG criterias.
 
-13. -> Make sure it's all responsive.
+15. -> Make sure it's all responsive.
 
-14. -> Clean and shave excessive code.
+16. -> Clean and shave excessive code.
 
-15. -> Add some CSS animations and proceed re-iterate this list.
+17. -> Add some CSS animations and proceed re-iterate this list.
