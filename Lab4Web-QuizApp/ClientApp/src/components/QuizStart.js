@@ -13,17 +13,17 @@ class QuizStart extends Component {
             isWantToPlay: false,
             questionData: []
         }
-        this.fetchData = this.fetchData.bind(this)
+        this.fetchQuizData = this.fetchQuizData.bind(this)
         this.seedDatabase = this.seedDatabase.bind(this)
         this.renderQuiz = this.renderQuiz.bind(this)
         this.genericHandler = this.genericHandler.bind(this)
     }
 
     componentDidMount() {
-        this.fetchData();
+        this.fetchQuizData();
     }
 
-    async fetchData() {
+    async fetchQuizData() {
         await fetch('questions', {
             method: 'GET'
         })
@@ -51,7 +51,15 @@ class QuizStart extends Component {
                 console.log(error)
             });
 
-        this.fetchData()
+        await fetch('database', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            })
+
+        this.fetchQuizData()
     }
 
     renderQuiz() {

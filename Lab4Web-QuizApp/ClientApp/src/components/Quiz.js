@@ -13,7 +13,6 @@ class Quiz extends Component {
             quizComplete: false,
         }
         this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
-        // this.renderQuiz = this.renderQuiz.bind(this)
     }
 
     handleAnswerSelection(selectedAnswer) {

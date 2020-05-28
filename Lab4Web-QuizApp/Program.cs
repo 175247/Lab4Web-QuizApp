@@ -14,9 +14,6 @@ namespace Lab4Web_QuizApp
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
-
-            //var dbInitializer = new DbInitializer();
-            //dbInitializer.SeedDatabase();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

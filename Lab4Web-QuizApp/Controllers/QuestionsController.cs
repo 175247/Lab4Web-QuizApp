@@ -78,13 +78,14 @@ namespace Lab4Web_QuizApp.Controllers
             }
             else // Leaving this "else" here for clarity and readability.
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
                 {
                     message = "The database is currently unavailable."
                 });
             }
         }
 
+        [Authorize(Roles="Administrator")]
         [HttpPost]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {
@@ -124,7 +125,7 @@ namespace Lab4Web_QuizApp.Controllers
             }
             catch (Exception exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
                 {
                     message = "The database is currently unavailable.",
                     Description = exception.InnerException
