@@ -52,9 +52,13 @@ export class Home extends Component {
           you open a command prompt in that directory, you can run{" "}
           <code>npm</code> commands such as <code>npm test</code> or{" "}
           <code>npm install</code>.
-          <SubmitNewQuestion />
+          <SubmitNewQuestion submit={this.submit} />
         </p>
       </div>
     );
+  submit = (data) => {
+    console.log(data);
+  };
+
   }
 }
