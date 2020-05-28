@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4Web_QuizApp.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class recreatemigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

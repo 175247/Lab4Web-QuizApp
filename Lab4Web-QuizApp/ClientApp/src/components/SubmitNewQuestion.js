@@ -6,7 +6,11 @@ class SubmitNewQuestion extends Component {
   state = {
     data: {
       question: "",
-      answers: ["", "", ""],
+      answers: {
+        answer1: "",
+        answer2: "",
+        answer3: "",
+      },
     },
     loading: false,
     errors: {},
@@ -45,7 +49,25 @@ class SubmitNewQuestion extends Component {
             type="answer1"
             id="answer1"
             name="answer1"
-            value={data.answer}
+            value={data.answers.answer1}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label htmlFor="answer2">Answer 1</label>
+          <input
+            type="answer2"
+            id="answer2"
+            name="answer2"
+            value={data.answers.answer2}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label htmlFor="answer3">Answer 1</label>
+          <input
+            type="answer3"
+            id="answer3"
+            name="answer3"
+            value={data.answers.answer3}
           />
         </Form.Field>
         <Button primary>Submit question</Button>
