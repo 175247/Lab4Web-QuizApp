@@ -9,7 +9,7 @@ class SubmitNewQuestion extends Component {
     this.state = {
       data: {
         question: "",
-        answer1: "",
+        correctAnswer: "",
         answer2: "",
         answer3: "",
       },
@@ -38,7 +38,8 @@ class SubmitNewQuestion extends Component {
   validate = (data) => {
     const errors = {};
     if (!data.question) errors.question = "You need to enter the question";
-    if (!data.answer1) errors.answer1 = "Answer nr 1 required";
+    if (!data.correctAnswer)
+      errors.correctAnswer = "Correct answer is required";
     if (!data.answer2) errors.answer2 = "Answer nr 2 required";
     if (!data.answer3) errors.answer3 = "Answer nr 3 required";
     return errors;
@@ -49,7 +50,8 @@ class SubmitNewQuestion extends Component {
     return (
       <Form onSubmit={this.onSubmit}>
         <Form.Field error={!!errors.question}>
-          <label htmlFor="question">Question</label>
+          <label htmlFor="question">Question:</label>
+          <br />
           <input
             type="text"
             id="question"
@@ -59,19 +61,21 @@ class SubmitNewQuestion extends Component {
           />
           {errors.question && <InlineError text={errors.question} />}
         </Form.Field>
-        <Form.Field error={!!errors.answer1}>
-          <label htmlFor="answer1">Answer 1</label>
+        <Form.Field error={!!errors.correctAnswer}>
+          <label htmlFor="correctAnswer">Correct Answer:</label>
+          <br />
           <input
             type="text"
-            id="answer1"
-            name="answer1"
-            value={data.answer1}
+            id="correctAnswer"
+            name="correctAnswer"
+            value={data.correctAnswer}
             onChange={this.onChange}
           />
-          {errors.answer1 && <InlineError text={errors.answer1} />}
+          {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
         </Form.Field>
         <Form.Field error={!!errors.answer2}>
-          <label htmlFor="answer2">Answer 2</label>
+          <label htmlFor="answer2">Answer 2:</label>
+          <br />
           <input
             type="text"
             id="answer2"
@@ -82,7 +86,8 @@ class SubmitNewQuestion extends Component {
           {errors.answer2 && <InlineError text={errors.answer2} />}
         </Form.Field>
         <Form.Field error={!!errors.answer3}>
-          <label htmlFor="answer3">Answer 3</label>
+          <label htmlFor="answer3">Answer 3:</label>
+          <br />
           <input
             type="text"
             id="answer3"

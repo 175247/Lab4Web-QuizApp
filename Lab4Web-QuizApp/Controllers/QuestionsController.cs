@@ -85,7 +85,7 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {
             // Make validation in React to check input.
