@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import Question from "./Question"
+import ScoreBoard from './ScoreBoard'
 
 class Quiz extends Component {
     constructor(props) {
@@ -13,6 +14,7 @@ class Quiz extends Component {
             quizComplete: false,
         }
         this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
+        this.renderScore = this.renderScore.bind(this)
     }
 
     handleAnswerSelection(selectedAnswer) {
@@ -40,10 +42,20 @@ class Quiz extends Component {
         } else {
             this.setState(previousState => ({
                 index: previousState.index + 1,
+                score: previousState.score + 1,
                 isCorrectAnswer: false,
                 invalidAnswer: false
             }))
         }
+    }
+
+    renderScore() {
+        return (
+            <div>
+                <p>Well done! You scored a total of {this.state.score}!</p>
+                <ScoreBoard />
+            </div>
+        )
     }
 
     render() {
@@ -51,7 +63,7 @@ class Quiz extends Component {
         let data = this.state.questionData[index]
 
         let content = this.state.quizComplete ?
-            <p>Well done, bitch!</p> : <Question
+            this.renderScore() : <Question
                 question={data}
                 handler={this.handleAnswerSelection}
             />
