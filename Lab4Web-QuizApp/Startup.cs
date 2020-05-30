@@ -44,6 +44,7 @@ namespace Lab4Web_QuizApp
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            services.AddCors();
             services.AddMvcCore();
 
             // In production, the React files will be served from this directory
@@ -68,11 +69,13 @@ namespace Lab4Web_QuizApp
                 app.UseHsts();
             }
 
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseIdentityServer();

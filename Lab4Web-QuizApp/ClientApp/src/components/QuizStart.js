@@ -25,7 +25,8 @@ class QuizStart extends Component {
 
     async fetchQuizData() {
         await fetch('questions', {
-            method: 'GET'
+            method: 'GET',
+            xhrFields: { withCredentials: true }
         })
             .then(response => response.json())
             .then(data => {

@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,13 +42,15 @@ namespace Lab4Web_QuizApp.Controllers
                 await _roleManager.CreateAsync(new IdentityRole(roleName));
             }
         
-            var adminUser = new AdminUser
+            var adminUser = new ApplicationUser
             {
-                Email = "admin@admin.com",
                 UserName = "admin@admin.com",
-                Password = "admin"
+                Email = "admin@admin.com",
+                EmailConfirmed = true
             };
-            var actionResult = await _userManager.CreateAsync(adminUser);
+            var password = "admin";
+
+            var actionResult = await _userManager.CreateAsync(adminUser, password);
         
             if (actionResult.Succeeded)
             {
@@ -127,9 +130,21 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 try
                 {
+                    //var currentUser = await _userManager.GetUserAsync(User);
+                    //
+                    //var highScoreDummy = new HighScore
+                    //{
+                    //    DateSubmitted = DateTime.Now,
+                    //    Score = 3,
+                    //    User = currentUser,
+                    //    Username = currentUser.Email
+                    //};
+
+
                     await _context.Questions.AddRangeAsync(questions);
+                    //await _context.HighScores.AddAsync(highScoreDummy);
                     await _context.SaveChangesAsync();
-        
+
                     return Ok(new
                     {
                         success = true,

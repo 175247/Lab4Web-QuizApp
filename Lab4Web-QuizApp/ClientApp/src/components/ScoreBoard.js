@@ -4,7 +4,8 @@ class ScoreBoard extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            highScores: []
+            highScores: [],
+            isScoreExists: false
         }
     }
 
@@ -14,7 +15,7 @@ class ScoreBoard extends Component {
             .then(data => {
                 this.setState({
                     highScores: data,
-                    isScoreExists: false
+                    isScoreExists: true
                 })
             })
     }
@@ -52,7 +53,7 @@ class ScoreBoard extends Component {
     }
 
     render() {
-        let content = isScoreExists ?
+        let content = this.state.isScoreExists ?
             this.renderScores() : this.renderNoScore()
 
         return (
