@@ -63,3 +63,5 @@ https://stackoverflow.com/questions/52659194/how-can-i-effectively-bind-json-dat
 https://www.c-sharpcorner.com/article/how-to-use-dropdown-and-radio-buttons-in-react/
 
 https://stackoverflow.com/questions/42701129/how-to-push-to-history-in-react-router-v4
+
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
