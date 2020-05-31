@@ -57,6 +57,9 @@ Receive the model, check for null and then map the request DTO to the databsemod
 17. -> Add some CSS animations and proceed re-iterate this list.
 
 https://www.pluralsight.com/guides/how-to-use-radio-buttons-in-reactjs
+
 https://stackoverflow.com/questions/52659194/how-can-i-effectively-bind-json-data-to-a-radio-button-in-react
+
 https://www.c-sharpcorner.com/article/how-to-use-dropdown-and-radio-buttons-in-react/
+
 https://stackoverflow.com/questions/42701129/how-to-push-to-history-in-react-router-v4
