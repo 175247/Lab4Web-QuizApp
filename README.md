@@ -40,13 +40,8 @@
 
 10. -> Create a post-route and component where user, in a form, enters a question, then (not needed) page changes to add 4 answers (and set a radio button on the correct one or something like that), use routing and push to history.
 
-10.1 -> Call a post API and send the [FromBody]. Add it to the database.
-
-(not needed) 11. -> Create a component to log in with, send a post request to the controller api, check login credentials -
-		If the credentials are OK, send an ok request and success-status. If success, proceed. else show error etc.
-		Inject the userManager/SignIn-manager in the controller and make requests as such.
-
-(not needed) 11.1 Create a registration with post etc. Remember to check if the user already exists in the api. Similar to the sign in.
+10.1 -> Pointing to the API, use fetch with the method 'POST', headers: { "Content-type": "application/json"}, and send in the methods body: JSON.stringify({object that fits the database databasemodel})
+Receive the model, check for null and then map the request DTO to the databsemodel and add to Db. Then map to a responsemodel and return Ok if all went well. Else error.
 
 (done) 12. -> Create the admin role.
 
