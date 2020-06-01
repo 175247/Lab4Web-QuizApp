@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Authorize(Roles="Administrator")]
+    //[Authorize(Roles="Administrator")]
     [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
@@ -86,7 +86,7 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
-        [Authorize(Roles="Administrator")]
+        //[Authorize(Roles="Administrator")]
         [HttpPost]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {

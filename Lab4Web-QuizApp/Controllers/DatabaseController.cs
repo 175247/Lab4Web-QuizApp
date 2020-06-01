@@ -32,25 +32,41 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CheckUserRole([FromBody] ApplicationUser user)
+        [HttpPost]
+        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
         {
-            if (user == null)
+            if (userId == null)
             {
                 return BadRequest();
             }
 
-            var isUserAnAdmin = await _userManager.IsInRoleAsync(user, "Administrator");
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAnAdmin = false;
+            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
+            
+            foreach (var admins in adminRoleUsers)
+            {
+                if (admins.Id == currentUser.Id)
+                    isUserAnAdmin = true;
+            }
 
             if (isUserAnAdmin)
             {
                 return Ok(new
                 {
                     success = true,
-                    message = $"The user {user.Email} is an admin"
+                    message = $"The user {currentUser.Email} is an admin"
                 });
             }
-
+            else
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"The user {currentUser.Email} is NOT an admin"
+                });
+            }
+            
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
                 success = false,
@@ -58,45 +74,45 @@ namespace Lab4Web_QuizApp.Controllers
             });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SeedAdmin()
-        {
-            string roleName = "Administrator";
-            var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
-        
-            if (!isRoleExists)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
-            }
-        
-            var adminUser = new ApplicationUser
-            {
-                UserName = "admin@admin.com",
-                Email = "admin@admin.com",
-                EmailConfirmed = true
-            };
-            var password = "Admin1½";
-
-            var actionResult = await _userManager.CreateAsync(adminUser, password);
-        
-            if (actionResult.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(adminUser, roleName);
-
-                return Ok(new
-                {
-                    success = true,
-                    description = "Admin user added."
-                });
-            }
-        
-            return StatusCode(StatusCodes.Status500InternalServerError, new
-            {
-                success = false,
-                description = actionResult.Errors
-            });
-        
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> SeedAdmin()
+        //{
+        //    string roleName = "Administrator";
+        //    var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
+        //
+        //    if (!isRoleExists)
+        //    {
+        //        await _roleManager.CreateAsync(new IdentityRole(roleName));
+        //    }
+        //
+        //    var adminUser = new ApplicationUser
+        //    {
+        //        UserName = "admin@admin.com",
+        //        Email = "admin@admin.com",
+        //        EmailConfirmed = true
+        //    };
+        //    var password = "Admin1½";
+        //
+        //    var actionResult = await _userManager.CreateAsync(adminUser, password);
+        //
+        //    if (actionResult.Succeeded)
+        //    {
+        //        await _userManager.AddToRoleAsync(adminUser, roleName);
+        //
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            description = "Admin user added."
+        //        });
+        //    }
+        //
+        //    return StatusCode(StatusCodes.Status500InternalServerError, new
+        //    {
+        //        success = false,
+        //        description = actionResult.Errors
+        //    });
+        //
+        //}
 
         [HttpPut]
         public async Task<IActionResult> SeedDatabase()

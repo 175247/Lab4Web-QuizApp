@@ -27,34 +27,53 @@ class QuizStart extends Component {
     componentDidMount() {
         this.fetchQuizData();
         this.getUserData();
+        this.checkUserRole();
     }
 
     async getUserData() {
         const token = await authService.getAccessToken();
         const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
         this.setState({
-            isAuthenticated,
+            isAuthenticated: isAuthenticated,
             user: user,
             token: token
         });
+
+        this.checkUserRole();
     }
 
     async checkUserRole() {
-        await fetch('database', {
-            method: 'GET',
-            headers: !this.state.token ?
-                {} : { 'Authorization': `Bearer ${this.state.token}` },
-            body: JSON.stringify(this.state.user)
+        const user = this.state.user
+        return await fetch("database", {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify(user.sub),
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.setState({
-                        isUserAnAdmin: true
-                    })
-                }
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
             })
+            .catch((error) => {
+                console.log(error);
+            });
     }
+
+    //async checkUserRole() {
+    //    await fetch('database', {
+    //        method: 'POST',
+    //        headers: !this.state.token ?
+    //            {} : { 'Authorization': `Bearer ${this.state.token}` },
+    //        body: JSON.stringify("herp")
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            if (data.success) {
+    //                this.setState({
+    //                    isUserAnAdmin: true
+    //                })
+    //            }
+    //        })
+    //}
 
     async fetchQuizData() {
         await fetch('questions', {

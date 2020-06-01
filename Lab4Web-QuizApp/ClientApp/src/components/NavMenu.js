@@ -22,15 +22,15 @@ export class NavMenu extends Component {
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       collapsed: true,
-      token: [],
-      isAuthenticated: false,
-      user: {}
+      //    accessToken: [],
+      //    isUserAuthenticated: false,
+      //    currentUser: {}
     };
   }
 
   componentDidMount() {
-    this.getUserData();
-    this.checkUserRole();
+    //   this.getUserData();
+
   }
 
   toggleNavbar() {
@@ -39,32 +39,33 @@ export class NavMenu extends Component {
     });
   }
 
-  async getUserData() {
-    const token = await authService.getAccessToken();
-    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
-    this.setState({
-      isAuthenticated,
-      user: user,
-      token: token
-    });
-  }
+  //async getUserData() {
+  //  const token = await authService.getAccessToken();
+  //  const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+  //  this.setState({
+  //    isUserAuthenticated: isAuthenticated,
+  //    currentUser: user,
+  //    accessToken: token
+  //  });
+  //  this.checkUserRole();
+  //}
 
-  async checkUserRole() {
-    await fetch('database', {
-      method: 'GET',
-      headers: !this.state.token ?
-        {} : { 'Authorization': `Bearer ${this.state.token}` },
-      body: JSON.stringify(this.state.user)
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          this.setState({
-            isUserAnAdmin: true
-          })
-        }
-      })
-  }
+  //async checkUserRole() {
+  //  await fetch('database', {
+  //    method: 'POST',
+  //    headers: !this.state.token ?
+  //      {} : { "Content-type": "application/json", 'Authorization': `Bearer ${this.state.token}` },
+  //    body: JSON.stringify(this.state.user)
+  //  })
+  //    .then(response => response.json())
+  //    .then(data => {
+  //      if (data.success) {
+  //        this.setState({
+  //          isUserAnAdmin: true
+  //        })
+  //      }
+  //    })
+  //}
 
   renderNavbarNormal() {
     return (
@@ -97,15 +98,6 @@ export class NavMenu extends Component {
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/fetch-data">
                     Fetch data
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    tag={Link}
-                    className="text-dark"
-                    to="/SubmitNewQuestion"
-                  >
-                    Submit New Question
                   </NavLink>
                 </NavItem>
                 <LoginMenu></LoginMenu>
@@ -146,11 +138,6 @@ export class NavMenu extends Component {
                 </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">
-                    Counter
-                </NavLink>
-                </NavItem>
-                <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/fetch-data">
                     Fetch data
                 </NavLink>
@@ -175,7 +162,8 @@ export class NavMenu extends Component {
 
 
   render() {
-    let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin : this.renderNavbarNormal
+    //let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
+    let adminStuff = this.renderNavbarAdmin();
     return (
       <div>
         {adminStuff}
