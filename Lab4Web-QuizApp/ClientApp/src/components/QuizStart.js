@@ -12,7 +12,9 @@ class QuizStart extends Component {
             isDatabaseSeeded: false,
             seedStatus: "",
             isWantToPlay: false,
-            questionData: []
+            questionData: [],
+            isAuthenticated: false,
+            user: {}
         }
         this.fetchQuizData = this.fetchQuizData.bind(this)
         this.seedDatabase = this.seedDatabase.bind(this)
@@ -22,42 +24,29 @@ class QuizStart extends Component {
 
     componentDidMount() {
         this.fetchQuizData();
+        this.getUserData();
     }
 
-    // SEND the token in the header with the fetch requests,
-    // to pass the authorization token in order to access the [Authorized] controllers.
-    // Also use the populateState() way to get the authentication and user, save in state
-    // perhaps, but must send as an object to the [Authorize(role="administrator")] controllers
-    // in order to access them. In those, get the current logged in user and check if the user is
-    // a member of the admins-role.
-    //
-    //async populateWeatherData() {
-    //    const token = await authService.getAccessToken();
-    //    const response = await fetch('weatherforecast', 
-    //    {
-    //        headers: !token ? 
-    //        {} : { 'Authorization': `Bearer ${token}` }
-    //    });
-    //    const data = await response.json();
-    //    this.setState({
-    //         forecasts: data, loading: false 
-    //        });
-    //    
-    //}
-    //
-    //
-    //async populateState() {
-    //    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
-    //    this.setState({
-    //        isAuthenticated,
-    //        userName: user && user.name
-    //    });
-    //}
+    async getUserData() {
+        const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+        this.setState({
+            isAuthenticated,
+            user: user,
+        });
+
+        if (this.state.user != null) {
+            console.log(this.state.user)
+            console.log(this.state.user.name)
+            console.log(this.state.user.preferred_username)
+        }
+    }
 
     async fetchQuizData() {
+        const token = await authService.getAccessToken();
         await fetch('questions', {
             method: 'GET',
-            xhrFields: { withCredentials: true }
+            headers: !token ?
+                {} : { 'Authorization': `Bearer ${token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -70,8 +59,11 @@ class QuizStart extends Component {
     }
 
     async seedDatabase() {
+        const token = await authService.getAccessToken();
         await fetch('database', {
-            method: 'PUT'
+            method: 'PUT',
+            headers: !token ?
+                {} : { 'Authorization': `Bearer ${token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -84,7 +76,9 @@ class QuizStart extends Component {
             });
 
         await fetch('database', {
-            method: 'POST'
+            method: 'POST',
+            headers: !token ?
+                {} : { 'Authorization': `Bearer ${token}` }
         })
             .then(response => response.json())
             .then(data => {

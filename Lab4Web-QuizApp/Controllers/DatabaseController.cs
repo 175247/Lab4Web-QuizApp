@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
+    //[Authorize(Roles ="Administrator")]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -34,7 +35,7 @@ namespace Lab4Web_QuizApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SeedAdmin()
         {
-            string roleName = "administrator";
+            string roleName = "Administrator";
             var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
         
             if (!isRoleExists)
@@ -48,13 +49,14 @@ namespace Lab4Web_QuizApp.Controllers
                 Email = "admin@admin.com",
                 EmailConfirmed = true
             };
-            var password = "admin";
+            var password = "Admin1½";
 
             var actionResult = await _userManager.CreateAsync(adminUser, password);
         
             if (actionResult.Succeeded)
             {
                 await _userManager.AddToRoleAsync(adminUser, roleName);
+
                 return Ok(new
                 {
                     success = true,
