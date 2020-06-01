@@ -17,19 +17,19 @@ class Quiz extends Component {
         this.renderScore = this.renderScore.bind(this)
     }
 
-    handleAnswerSelection(selectedAnswer) {
-        if (selectedAnswer.isCorrectAnswer === true) {
-            this.setState({
-                isCorrectAnswer: true,
-                invalidAnswer: false
-            })
-            this.loadQuestion()
-        } else {
-            this.setState({
-                invalidAnswer: true
-            })
-        }
+  handleAnswerSelection(selectedAnswer) {
+    if (selectedAnswer.isCorrectAnswer === true) {
+      this.setState({
+        isCorrectAnswer: true,
+        invalidAnswer: false,
+      });
+      this.loadQuestion();
+    } else {
+      this.setState({
+        invalidAnswer: true,
+      });
     }
+  }
 
     loadQuestion() {
         if (this.state.index === this.state.questionData.length - 1) {
@@ -71,13 +71,13 @@ class Quiz extends Component {
         let answerStatus = this.state.invalidAnswer ?
             <h1>Damn son, wrong answer...</h1> : null
 
-        return (
-            <div>
-                {content}
-                {answerStatus}
-            </div>
-        )
-    }
+    return (
+      <div>
+        {content}
+        {answerStatus}
+      </div>
+    );
+  }
 }
 
-export default Quiz
+export default Quiz;

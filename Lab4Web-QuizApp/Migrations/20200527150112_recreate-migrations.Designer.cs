@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200525190651_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20200527150112_recreate-migrations")]
+    partial class recreatemigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
