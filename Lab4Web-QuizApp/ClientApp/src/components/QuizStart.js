@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import authService from './api-authorization/AuthorizeService'
 import Quiz from './Quiz'
 
 class QuizStart extends Component {
@@ -22,6 +23,36 @@ class QuizStart extends Component {
     componentDidMount() {
         this.fetchQuizData();
     }
+
+    // SEND the token in the header with the fetch requests,
+    // to pass the authorization token in order to access the [Authorized] controllers.
+    // Also use the populateState() way to get the authentication and user, save in state
+    // perhaps, but must send as an object to the [Authorize(role="administrator")] controllers
+    // in order to access them. In those, get the current logged in user and check if the user is
+    // a member of the admins-role.
+    //
+    //async populateWeatherData() {
+    //    const token = await authService.getAccessToken();
+    //    const response = await fetch('weatherforecast', 
+    //    {
+    //        headers: !token ? 
+    //        {} : { 'Authorization': `Bearer ${token}` }
+    //    });
+    //    const data = await response.json();
+    //    this.setState({
+    //         forecasts: data, loading: false 
+    //        });
+    //    
+    //}
+    //
+    //
+    //async populateState() {
+    //    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    //    this.setState({
+    //        isAuthenticated,
+    //        userName: user && user.name
+    //    });
+    //}
 
     async fetchQuizData() {
         await fetch('questions', {
