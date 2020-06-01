@@ -85,29 +85,26 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {
-            // Make validation in React to check input.
-            // Need to make sure that all fields have text in them and at least one is selected as the correct answer.
-            //var requestAnswerOptions = Enumerable.Range(0, request.AnswerOptions.Count())
-            //            .Select(index => new Answer
-            //            {
-            //                AnswerString = request.AnswerOptions[index].AnswerString,
-            //                IsCorrectAnswer = request.AnswerOptions[index].IsCorrectAnswer
-            //            });
+            if (request == null)
+            {
+                return BadRequest(new { success = false, message = "Body cannot contain null" });
+            }
+
+            var answers = new List<Answer>();
+            foreach (var answer in request.AnswerOptions)
+            {
+                answers.Add(answer);
+            }
 
             var question = new Question
             {
                 QuestionString = request.QuestionString,
-                AnswerOptions = Enumerable.Range(0, request.AnswerOptions.Count())
-                        .Select(index => new Answer
-                        {
-                            AnswerString = request.AnswerOptions[index].AnswerString,
-                            IsCorrectAnswer = request.AnswerOptions[index].IsCorrectAnswer
-                        })
+                AnswerOptions = answers
             };
-
+             
             try
             {
                 await _context.Questions.AddAsync(question);
