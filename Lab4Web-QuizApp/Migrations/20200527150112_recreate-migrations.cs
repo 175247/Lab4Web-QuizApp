@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4Web_QuizApp.Migrations
 {
-    public partial class AddQuestionsAndAnswers : Migration
+    public partial class recreatemigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -205,9 +205,9 @@ namespace Lab4Web_QuizApp.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    QuestionId = table.Column<int>(nullable: false),
                     AnswerString = table.Column<string>(nullable: true),
-                    IsCorrectAnswer = table.Column<bool>(nullable: false),
-                    QuestionId = table.Column<int>(nullable: false)
+                    IsCorrectAnswer = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

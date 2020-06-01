@@ -10,6 +10,6 @@ namespace Lab4Web_QuizApp.Models.HTTP
         public DateTime RequestTime { get; set; }
         public int Id { get; set; }
         public string QuestionString { get; set; }
-        public virtual ICollection<Answer> AnswerOptions { get; set; }
+        public virtual IEnumerable<Answer> AnswerOptions { get; set; }
     }
 }

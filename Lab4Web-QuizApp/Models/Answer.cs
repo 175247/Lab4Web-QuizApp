@@ -9,9 +9,8 @@ namespace Lab4Web_QuizApp.Models
     public class Answer
     {
         public int Id { get; set; }
+        public virtual int QuestionId { get; set; }
         public string AnswerString { get; set; }
         public bool IsCorrectAnswer { get; set; }
-        public virtual int QuestionId { get; set; }
-        public virtual Question Question { get; set; }
     }
 }

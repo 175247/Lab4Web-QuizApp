@@ -341,7 +341,7 @@ namespace Lab4Web_QuizApp.Migrations
 
             modelBuilder.Entity("Lab4Web_QuizApp.Models.Answer", b =>
                 {
-                    b.HasOne("Lab4Web_QuizApp.Models.Question", "Question")
+                    b.HasOne("Lab4Web_QuizApp.Models.Question", null)
                         .WithMany("AnswerOptions")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
