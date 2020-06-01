@@ -38,9 +38,9 @@
 	
 (done)	9.3 -> Implement it.
 
-10. -> Create a post-route and component where user, in a form, enters a question, and add 3 answers (and set a radio button on the correct one, or use a dropdown menu or something like that), use routing and push to history. Link at bottom.
+(done) 10. -> Create a post-route and component where user, in a form, enters a question, and add 3 answers (and set a radio button on the correct one, or use a dropdown menu or something like that), use routing and push to history. Link at bottom.
 
-10.1 -> Pointing to the API, use fetch with the method 'POST', headers: { "Content-type": "application/json"}, and send in the methods body: JSON.stringify({object that fits the database databasemodel})
+(done) 10.1 -> Pointing to the API, use fetch with the method 'POST', headers: { "Content-type": "application/json"}, and send in the methods body: JSON.stringify({object that fits the database databasemodel})
 Receive the model, check for null and then map the request DTO to the databsemodel and add to Db. Then map to a responsemodel and return Ok if all went well. Else error. Db will fix the Id, not needed to be sent with fetch to the API.
 
 (done) 12. -> Create the admin role.
