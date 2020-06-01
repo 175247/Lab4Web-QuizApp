@@ -5,7 +5,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
@@ -17,10 +19,55 @@ namespace Lab4Web_QuizApp.Controllers
     public class DatabaseController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DatabaseController(ApplicationDbContext context)
+        public DatabaseController(ApplicationDbContext context,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SeedAdmin()
+        {
+            string roleName = "administrator";
+            var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
+        
+            if (!isRoleExists)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        
+            var adminUser = new ApplicationUser
+            {
+                UserName = "admin@admin.com",
+                Email = "admin@admin.com",
+                EmailConfirmed = true
+            };
+            var password = "admin";
+
+            var actionResult = await _userManager.CreateAsync(adminUser, password);
+        
+            if (actionResult.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(adminUser, roleName);
+                return Ok(new
+                {
+                    success = true,
+                    description = "Admin user added."
+                });
+            }
+        
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                success = false,
+                description = actionResult.Errors
+            });
+        
         }
 
         [HttpPut]
@@ -28,7 +75,7 @@ namespace Lab4Web_QuizApp.Controllers
         {
             await _context.Database.MigrateAsync();
             var questionBank = await _context.Questions.Include(a => a.AnswerOptions).ToListAsync();
-
+        
             var questions = new List<Question>
             {
                 new Question
@@ -83,10 +130,22 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 try
                 {
+                    //var currentUser = await _userManager.GetUserAsync(User);
+                    //
+                    //var highScoreDummy = new HighScore
+                    //{
+                    //    DateSubmitted = DateTime.Now,
+                    //    Score = 3,
+                    //    User = currentUser,
+                    //    Username = currentUser.Email
+                    //};
+
+
                     await _context.Questions.AddRangeAsync(questions);
+                    //await _context.HighScores.AddAsync(highScoreDummy);
                     await _context.SaveChangesAsync();
 
-                    return Ok(new 
+                    return Ok(new
                     {
                         success = true,
                         description = "Seed complete"

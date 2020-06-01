@@ -11,6 +11,7 @@ using Lab4Web_QuizApp.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Lab4Web_QuizApp
 {
@@ -31,6 +32,7 @@ namespace Lab4Web_QuizApp
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
@@ -42,6 +44,7 @@ namespace Lab4Web_QuizApp
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            services.AddCors();
             services.AddMvcCore();
 
             // In production, the React files will be served from this directory
@@ -66,11 +69,13 @@ namespace Lab4Web_QuizApp
                 app.UseHsts();
             }
 
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseIdentityServer();

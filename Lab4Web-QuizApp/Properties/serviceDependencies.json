@@ -7,6 +7,9 @@
     "mssql2": {
       "type": "mssql",
       "connectionId": "Lab4Web_QuizAppContext"
+    },
+    "secrets1": {
+      "type": "secrets"
     }
   }
 }

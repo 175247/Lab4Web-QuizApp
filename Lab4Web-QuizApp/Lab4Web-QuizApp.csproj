@@ -8,6 +8,7 @@
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <RootNamespace>Lab4Web_QuizApp</RootNamespace>
+    <UserSecretsId>2bd479de-8e13-48bf-aaf0-532a85211f86</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

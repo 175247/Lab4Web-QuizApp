@@ -14,7 +14,7 @@ namespace Lab4Web_QuizApp.Data
     {
         public DbSet<Question> Questions { get; set; }
         public DbSet<Answer> Answers { get; set; }
-
+        public DbSet<HighScore> HighScores { get; set; }
 
         public ApplicationDbContext(
             DbContextOptions options,
