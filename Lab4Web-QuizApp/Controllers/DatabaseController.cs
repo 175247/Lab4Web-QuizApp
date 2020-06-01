@@ -32,6 +32,32 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CheckUserRole([FromBody] ApplicationUser user)
+        {
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var isUserAnAdmin = await _userManager.IsInRoleAsync(user, "Administrator");
+
+            if (isUserAnAdmin)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = $"The user {user.Email} is an admin"
+                });
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                success = false,
+                description = "The database is currently unavailable"
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> SeedAdmin()
         {

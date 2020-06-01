@@ -13,7 +13,9 @@ class QuizStart extends Component {
             seedStatus: "",
             isWantToPlay: false,
             questionData: [],
+            token: {},
             isAuthenticated: false,
+            isUserAnAdmin: false,
             user: {}
         }
         this.fetchQuizData = this.fetchQuizData.bind(this)
@@ -28,25 +30,37 @@ class QuizStart extends Component {
     }
 
     async getUserData() {
+        const token = await authService.getAccessToken();
         const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
         this.setState({
             isAuthenticated,
             user: user,
+            token: token
         });
+    }
 
-        if (this.state.user != null) {
-            console.log(this.state.user)
-            console.log(this.state.user.name)
-            console.log(this.state.user.preferred_username)
-        }
+    async checkUserRole() {
+        await fetch('database', {
+            method: 'GET',
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` },
+            body: JSON.stringify(this.state.user)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        isUserAnAdmin: true
+                    })
+                }
+            })
     }
 
     async fetchQuizData() {
-        const token = await authService.getAccessToken();
         await fetch('questions', {
             method: 'GET',
-            headers: !token ?
-                {} : { 'Authorization': `Bearer ${token}` }
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -59,11 +73,10 @@ class QuizStart extends Component {
     }
 
     async seedDatabase() {
-        const token = await authService.getAccessToken();
         await fetch('database', {
             method: 'PUT',
-            headers: !token ?
-                {} : { 'Authorization': `Bearer ${token}` }
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -77,8 +90,8 @@ class QuizStart extends Component {
 
         await fetch('database', {
             method: 'POST',
-            headers: !token ?
-                {} : { 'Authorization': `Bearer ${token}` }
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -131,14 +144,11 @@ class QuizStart extends Component {
         const { isWantToPlay, isDatabaseSeeded, isInitialSetup } = this.state
         let buttons = isWantToPlay ?
             this.renderQuiz() : this.renderButtons(isDatabaseSeeded)
-        //let loadStatus = isInitialSetup ?
-        //    buttons : <h1>Hold tight, loading all the amazeballs JUST for you!</h1>
 
         return (
             <div>
                 {buttons}
             </div>
-            //{loadStatus}
         )
     }
 }
