@@ -38,47 +38,49 @@ class QuizStart extends Component {
             user: user,
             token: token
         });
-        if (!user === null) { this.checkUserRole(); }
-    }
-
-    async checkUserRole() {
-        const user = this.state.user
-        return await fetch("database", {
-            method: "POST",
-            headers: { "Content-type": "application/json" },
-            body: JSON.stringify(user.sub),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        //this.checkUserRole()
+        //if (!user === null) { this.checkUserRole(); }
     }
 
     //async checkUserRole() {
-    //    await fetch('database', {
-    //        method: 'POST',
-    //        headers: !this.state.token ?
-    //            {} : { 'Authorization': `Bearer ${this.state.token}` },
-    //        body: JSON.stringify("herp")
+    //    const user = this.state.user
+    //    return await fetch("database", {
+    //        method: "POST",
+    //        headers: { "Content-type": "application/json" },
+    //        body: JSON.stringify(user.sub),
     //    })
-    //        .then(response => response.json())
-    //        .then(data => {
-    //            if (data.success) {
-    //                this.setState({
-    //                    isUserAnAdmin: true
-    //                })
-    //            }
+    //        .then((response) => response.json())
+    //        .then((data) => {
+    //            console.log(data);
     //        })
+    //        .catch((error) => {
+    //            console.log(error);
+    //        });
     //}
+
+    async checkUserRole() {
+        const token = await authService.getAccessToken();
+        await fetch('database', {
+            method: 'POST',
+            headers: !token ?
+                {} : { "Content-type": "application/json", 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify('hi')
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        isUserAnAdmin: true
+                    })
+                }
+            })
+    }
 
     async fetchQuizData() {
         await fetch('questions', {
             method: 'GET',
             headers: !this.state.token ?
-                {} : { 'Authorization': `Bearer ${this.state.token}` }
+                {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' }
         })
             .then(response => response.json())
             .then(data => {

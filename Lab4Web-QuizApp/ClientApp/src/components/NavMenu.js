@@ -165,9 +165,9 @@ export class NavMenu extends Component {
     //let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
     let adminStuff = this.renderNavbarAdmin();
     return (
-        <div>
-            {adminStuff}
-        </div>
+      <div>
+        {adminStuff}
+      </div>
     );
   }
 

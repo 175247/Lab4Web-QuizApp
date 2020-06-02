@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles ="Administrator")]
+    [Authorize(Roles ="Administrator")]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -39,7 +39,7 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 return BadRequest();
             }
-
+        
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var isUserAnAdmin = false;
             var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
@@ -49,7 +49,7 @@ namespace Lab4Web_QuizApp.Controllers
                 if (admins.Id == currentUser.Id)
                     isUserAnAdmin = true;
             }
-
+        
             if (isUserAnAdmin)
             {
                 return Ok(new
