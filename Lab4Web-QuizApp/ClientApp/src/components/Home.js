@@ -2,7 +2,15 @@ import React, { Component } from "react";
 import SubmitNewQuestion from "./SubmitNewQuestion";
 
 export class Home extends Component {
-  static displayName = Home.name;
+    static displayName = Home.name;
+    constructor() {
+       super()
+       this.submit = this.submit.bind(this);
+    }
+
+    submit = (data) => {
+        console.log(data);
+    }
 
   render() {
     return (

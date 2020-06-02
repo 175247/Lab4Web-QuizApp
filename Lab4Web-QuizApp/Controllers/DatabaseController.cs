@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
+    //[Authorize(Roles ="Administrator")]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -32,43 +33,86 @@ namespace Lab4Web_QuizApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SeedAdmin()
+        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
         {
-            string roleName = "administrator";
-            var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
-        
-            if (!isRoleExists)
+            if (userId == null)
             {
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
+                return BadRequest();
             }
-        
-            var adminUser = new ApplicationUser
-            {
-                UserName = "admin@admin.com",
-                Email = "admin@admin.com",
-                EmailConfirmed = true
-            };
-            var password = "admin";
 
-            var actionResult = await _userManager.CreateAsync(adminUser, password);
-        
-            if (actionResult.Succeeded)
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAnAdmin = false;
+            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
+            
+            foreach (var admins in adminRoleUsers)
             {
-                await _userManager.AddToRoleAsync(adminUser, roleName);
+                if (admins.Id == currentUser.Id)
+                    isUserAnAdmin = true;
+            }
+
+            if (isUserAnAdmin)
+            {
                 return Ok(new
                 {
                     success = true,
-                    description = "Admin user added."
+                    message = $"The user {currentUser.Email} is an admin"
                 });
             }
-        
+            else
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"The user {currentUser.Email} is NOT an admin"
+                });
+            }
+            
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
                 success = false,
-                description = actionResult.Errors
+                description = "The database is currently unavailable"
             });
-        
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> SeedAdmin()
+        //{
+        //    string roleName = "Administrator";
+        //    var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
+        //
+        //    if (!isRoleExists)
+        //    {
+        //        await _roleManager.CreateAsync(new IdentityRole(roleName));
+        //    }
+        //
+        //    var adminUser = new ApplicationUser
+        //    {
+        //        UserName = "admin@admin.com",
+        //        Email = "admin@admin.com",
+        //        EmailConfirmed = true
+        //    };
+        //    var password = "Admin1½";
+        //
+        //    var actionResult = await _userManager.CreateAsync(adminUser, password);
+        //
+        //    if (actionResult.Succeeded)
+        //    {
+        //        await _userManager.AddToRoleAsync(adminUser, roleName);
+        //
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            description = "Admin user added."
+        //        });
+        //    }
+        //
+        //    return StatusCode(StatusCodes.Status500InternalServerError, new
+        //    {
+        //        success = false,
+        //        description = actionResult.Errors
+        //    });
+        //
+        //}
 
         [HttpPut]
         public async Task<IActionResult> SeedDatabase()

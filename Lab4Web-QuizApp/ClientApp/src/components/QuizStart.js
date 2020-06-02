@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import authService from './api-authorization/AuthorizeService'
 import Quiz from './Quiz'
 
 class QuizStart extends Component {
@@ -11,7 +12,11 @@ class QuizStart extends Component {
             isDatabaseSeeded: false,
             seedStatus: "",
             isWantToPlay: false,
-            questionData: []
+            questionData: [],
+            token: {},
+            isAuthenticated: false,
+            isUserAnAdmin: false,
+            user: {}
         }
         this.fetchQuizData = this.fetchQuizData.bind(this)
         this.seedDatabase = this.seedDatabase.bind(this)
@@ -21,12 +26,60 @@ class QuizStart extends Component {
 
     componentDidMount() {
         this.fetchQuizData();
+        this.getUserData();
+        this.checkUserRole();
     }
+
+    async getUserData() {
+        const token = await authService.getAccessToken();
+        const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+        this.setState({
+            isAuthenticated: isAuthenticated,
+            user: user,
+            token: token
+        });
+
+        this.checkUserRole();
+    }
+
+    async checkUserRole() {
+        const user = this.state.user
+        return await fetch("database", {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify(user.sub),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    //async checkUserRole() {
+    //    await fetch('database', {
+    //        method: 'POST',
+    //        headers: !this.state.token ?
+    //            {} : { 'Authorization': `Bearer ${this.state.token}` },
+    //        body: JSON.stringify("herp")
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            if (data.success) {
+    //                this.setState({
+    //                    isUserAnAdmin: true
+    //                })
+    //            }
+    //        })
+    //}
 
     async fetchQuizData() {
         await fetch('questions', {
             method: 'GET',
-            xhrFields: { withCredentials: true }
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -40,7 +93,9 @@ class QuizStart extends Component {
 
     async seedDatabase() {
         await fetch('database', {
-            method: 'PUT'
+            method: 'PUT',
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -53,7 +108,9 @@ class QuizStart extends Component {
             });
 
         await fetch('database', {
-            method: 'POST'
+            method: 'POST',
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}` }
         })
             .then(response => response.json())
             .then(data => {
@@ -106,14 +163,11 @@ class QuizStart extends Component {
         const { isWantToPlay, isDatabaseSeeded, isInitialSetup } = this.state
         let buttons = isWantToPlay ?
             this.renderQuiz() : this.renderButtons(isDatabaseSeeded)
-        //let loadStatus = isInitialSetup ?
-        //    buttons : <h1>Hold tight, loading all the amazeballs JUST for you!</h1>
 
         return (
             <div>
                 {buttons}
             </div>
-            //{loadStatus}
         )
     }
 }

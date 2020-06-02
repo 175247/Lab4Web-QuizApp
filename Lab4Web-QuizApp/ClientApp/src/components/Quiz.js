@@ -17,20 +17,21 @@ class Quiz extends Component {
         this.renderScore = this.renderScore.bind(this)
     }
 
-    handleAnswerSelection(selectedAnswer) {
-        if (selectedAnswer.isCorrectAnswer === true) {
-            this.setState({
-                isCorrectAnswer: true,
-                invalidAnswer: false
-            })
-            this.loadQuestion()
-        } else {
-            this.setState({
-                invalidAnswer: true
-            })
-        }
+  handleAnswerSelection(selectedAnswer) {
+    if (selectedAnswer.isCorrectAnswer === true) {
+      this.setState({
+        isCorrectAnswer: true,
+        invalidAnswer: false,
+      });
+      this.loadQuestion();
+    } else {
+      this.setState({
+        invalidAnswer: true,
+      });
     }
+  }
 
+<<<<<<<<< Temporary merge branch 1
     loadQuestion() {
         if (this.state.index === this.state.questionData.length - 1) {
             return (
@@ -47,6 +48,22 @@ class Quiz extends Component {
                 invalidAnswer: false
             }))
         }
+=========
+  loadQuestion() {
+    if (this.state.index === this.state.questionData.length - 1) {
+      return (
+        //<p>DISPLAY SCORE</p>
+        this.setState({
+          quizComplete: true,
+        })
+      );
+    } else {
+      this.setState((previousState) => ({
+        index: previousState.index + 1,
+        isCorrectAnswer: false,
+        invalidAnswer: false,
+      }));
+>>>>>>>>> Temporary merge branch 2
     }
 
     renderScore() {

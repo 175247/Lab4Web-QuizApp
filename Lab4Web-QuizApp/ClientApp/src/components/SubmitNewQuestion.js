@@ -16,6 +16,7 @@ class SubmitNewQuestion extends Component {
       },
       loading: false,
       errors: {},
+      isUserAnAdmin: false
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
