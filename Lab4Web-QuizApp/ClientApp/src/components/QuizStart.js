@@ -38,8 +38,7 @@ class QuizStart extends Component {
             user: user,
             token: token
         });
-
-        this.checkUserRole();
+        if (!user === null) { this.checkUserRole(); }
     }
 
     async checkUserRole() {

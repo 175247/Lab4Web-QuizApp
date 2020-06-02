@@ -9,9 +9,10 @@ class SubmitNewQuestion extends Component {
     this.state = {
       data: {
         question: "",
-        correctAnswer: "",
+        answer1: "",
         answer2: "",
         answer3: "",
+        correctAnswer: "",
       },
       loading: false,
       errors: {},
@@ -39,10 +40,11 @@ class SubmitNewQuestion extends Component {
   validate = (data) => {
     const errors = {};
     if (!data.question) errors.question = "You need to enter the question";
-    if (!data.correctAnswer)
-      errors.correctAnswer = "Correct answer is required";
+    if (!data.answer1) errors.answer1 = "Answer nr 1 required";
     if (!data.answer2) errors.answer2 = "Answer nr 2 required";
     if (!data.answer3) errors.answer3 = "Answer nr 3 required";
+    if (!data.correctAnswer)
+      errors.correctAnswer = "You need to pick which answer is the correct one";
     return errors;
   };
 
@@ -62,17 +64,24 @@ class SubmitNewQuestion extends Component {
           />
           {errors.question && <InlineError text={errors.question} />}
         </Form.Field>
-        <Form.Field error={!!errors.correctAnswer}>
-          <label htmlFor="correctAnswer">Correct Answer:</label>
+        <Form.Field error={!!errors.answer1}>
+          <label htmlFor="answer1">Answer 1:</label>
           <br />
           <input
             type="text"
-            id="correctAnswer"
-            name="correctAnswer"
-            value={data.correctAnswer}
+            id="answer1"
+            name="answer1"
+            value={data.answer1}
             onChange={this.onChange}
           />
-          {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
+          <input
+            type="radio"
+            id="answer1radio"
+            name="correctAnswer"
+            value="answer1"
+            onChange={this.onChange}
+          />
+          {errors.answer1 && <InlineError text={errors.answer1} />}
         </Form.Field>
         <Form.Field error={!!errors.answer2}>
           <label htmlFor="answer2">Answer 2:</label>
@@ -82,6 +91,13 @@ class SubmitNewQuestion extends Component {
             id="answer2"
             name="answer2"
             value={data.answer2}
+            onChange={this.onChange}
+          />
+          <input
+            type="radio"
+            id="answer2radio"
+            name="correctAnswer"
+            value="answer2"
             onChange={this.onChange}
           />
           {errors.answer2 && <InlineError text={errors.answer2} />}
@@ -96,8 +112,17 @@ class SubmitNewQuestion extends Component {
             value={data.answer3}
             onChange={this.onChange}
           />
+          <input
+            type="radio"
+            id="answer3radio"
+            name="correctAnswer"
+            value="answer3"
+            onChange={this.onChange}
+          />
           {errors.answer3 && <InlineError text={errors.answer3} />}
         </Form.Field>
+        {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}{" "}
+        <br />
         <Button primary>Submit question</Button>
       </Form>
     );

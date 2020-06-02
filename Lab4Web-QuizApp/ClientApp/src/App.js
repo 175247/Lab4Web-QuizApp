@@ -11,6 +11,7 @@ import QuizStart from "./components/QuizStart";
 import Quiz from "./components/Quiz";
 import SubmitNewQuestion from "./components/SubmitNewQuestion";
 import Submit from "./components/Submit";
+import ScoreBoard from "./components/ScoreBoard";
 
 import "./custom.css";
 
@@ -28,12 +29,12 @@ export default class App extends Component {
           component={ApiAuthorizationRoutes}
         />
         <Route path="/quiz" component={Quiz} />
+        <Route path="/scoreboard" component={ScoreBoard} />
         <Route path="/quiz-start" component={QuizStart} />
         <Route
-          path="/SubmitNewQuestion"
+          path="/submit-new-question"
           render={(props) => <SubmitNewQuestion {...props} submit={Submit} />}
         />
-        <QuizStart />
       </Layout>
     );
   }

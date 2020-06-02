@@ -91,13 +91,13 @@ export class NavMenu extends Component {
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">
-                    Counter
+                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                    Quiz
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">
-                    Fetch data
+                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                    Scoreboard
                   </NavLink>
                 </NavItem>
                 <LoginMenu></LoginMenu>
@@ -133,20 +133,20 @@ export class NavMenu extends Component {
                 </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">
-                    Counter
-                </NavLink>
+                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                    Quiz
+                  </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">
-                    Fetch data
-                </NavLink>
+                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                    Scoreboard
+                  </NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink
                     tag={Link}
                     className="text-dark"
-                    to="/SubmitNewQuestion"
+                    to="/submit-new-question"
                   >
                     Submit New Question
                 </NavLink>
@@ -165,9 +165,10 @@ export class NavMenu extends Component {
     //let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
     let adminStuff = this.renderNavbarAdmin();
     return (
-      <div>
-        {adminStuff}
-      </div>
+        <div>
+            {adminStuff}
+        </div>
     );
   }
+
 }
