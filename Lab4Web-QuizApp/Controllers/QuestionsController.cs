@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http.Cors;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
 using Lab4Web_QuizApp.Models.HTTP;
@@ -19,7 +20,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles="Administrator")]
+    [Authorize]
     [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
