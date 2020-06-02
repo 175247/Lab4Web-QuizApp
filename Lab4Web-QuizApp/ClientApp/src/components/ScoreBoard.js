@@ -55,9 +55,8 @@ class ScoreBoard extends Component {
     render() {
         let content = this.state.isScoreExists ?
             this.renderScores() : this.renderNoScore()
-
         return (
-            { content }
+            content
         )
     }
 }
