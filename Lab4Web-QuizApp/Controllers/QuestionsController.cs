@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http.Cors;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
 using Lab4Web_QuizApp.Models.HTTP;
