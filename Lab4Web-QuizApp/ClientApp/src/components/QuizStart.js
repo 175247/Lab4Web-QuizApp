@@ -78,8 +78,8 @@ class QuizStart extends Component {
     async fetchQuizData() {
         await fetch('questions', {
             method: 'GET',
-            headers: !this.state.token ?
-                {} : { 'Authorization': `Bearer ${this.state.token}` }
+            headers: !token ?
+                {} : { 'Authorization': `Bearer ${token}`, 'Content-type': 'application/json' }
         })
             .then(response => response.json())
             .then(data => {
