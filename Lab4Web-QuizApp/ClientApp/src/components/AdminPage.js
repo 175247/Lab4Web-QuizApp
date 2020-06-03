@@ -3,7 +3,7 @@ import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
 
-class SubmitNewQuestion extends Component {
+class AdminPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +16,10 @@ class SubmitNewQuestion extends Component {
       },
       loading: false,
       errors: {},
-      isUserAnAdmin: false
+      isUserAnAdmin: true,
+      questionData: [],
+      isDatabaseSeeded: false,
+      newQuestion: false,
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -34,7 +37,15 @@ class SubmitNewQuestion extends Component {
     this.setState({ errors });
     if (Object.keys(errors).length === 0) {
       this.props.submit(this.state.data);
+      this.onClick()
     }
+  };
+
+  onClick = () => {
+    this.setState(previousState => ({
+      newQuestion: !previousState.newQuestion,
+      data: ""
+    }))
   };
 
   validate = (data) => {
@@ -48,10 +59,23 @@ class SubmitNewQuestion extends Component {
     return errors;
   };
 
-  render() {
+  async fetchQuizData() {
+    await fetch('questions', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          questionData: data,
+          isDatabaseSeeded: true,
+        })
+      });
+  }
+
+  renderNewQuestion() {
     const { data, errors } = this.state;
     return (
-      <Form onSubmit={this.onSubmit}>
+      <Form onSubmit={this.onSubmit} id="main-form">
         <Form.Field error={!!errors.question}>
           <label htmlFor="question">Question:</label>
           <br />
@@ -124,13 +148,50 @@ class SubmitNewQuestion extends Component {
         {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}{" "}
         <br />
         <Button primary>Submit question</Button>
+        <button onClick={this.onClick}>Back to the list</button>
       </Form>
     );
   }
-}
 
-SubmitNewQuestion.propTypes = {
+  renderQuestionList() {
+    if (!this.state.isDatabaseSeeded) {
+      //this.fetchQuizData();
+    }
+    return (
+      <div>
+        <button onClick={this.onClick}>New question</button>
+        {this.state.questionData}
+      </div>
+    )
+  }
+
+  renderAdmin() {
+    let adminPage = this.state.newQuestion ? this.renderNewQuestion() : this.renderQuestionList()
+    return (
+      adminPage
+    )
+  }
+
+  renderNormalUser() {
+    return (
+      <div>
+        <p>Nej</p>
+      </div>
+    )
+  }
+  render() {
+    let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    console.log(this.state.questionData)
+    return (
+      <div>
+        {adminCheck}
+      </div>
+    );
+  }
+
+}
+AdminPage.propTypes = {
   submit: PropTypes.func.isRequired,
 };
 
-export default SubmitNewQuestion;
+export default AdminPage;
