@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using IdentityModel;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Lab4Web_QuizApp.Controllers
 {
     public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
+    [Authorize(Roles = "Administrator")]
     [Route("administration")]
     [ApiController]
     public class AdministrationController : ControllerBase
@@ -52,47 +54,47 @@ namespace Lab4Web_QuizApp.Controllers
         //    return false;
         //}
 
-        //[HttpPost]
-        //public async Task<IActionResult> CheckUserRole([FromBody] string userId)
-        //{
-        //    if (userId == null)
-        //    {
-        //        return BadRequest();
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
+        {
+            if (userId == null)
+            {
+                return BadRequest();
+            }
 
-        //    var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        //    var isUserAnAdmin = false;
-        //    var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAnAdmin = false;
+            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
 
-        //    foreach (var admins in adminRoleUsers)
-        //    {
-        //        if (admins.Id == currentUser.Id)
-        //            isUserAnAdmin = true;
-        //    }
+            foreach (var admins in adminRoleUsers)
+            {
+                if (admins.Id == currentUser.Id)
+                    isUserAnAdmin = true;
+            }
 
-        //    if (isUserAnAdmin)
-        //    {
-        //        return Ok(new
-        //        {
-        //            success = true,
-        //            message = $"The user {currentUser.Email} is an admin"
-        //        });
-        //    }
-        //    else
-        //    {
-        //        return NotFound(new
-        //        {
-        //            success = false,
-        //            message = $"The user {currentUser.Email} is NOT an admin"
-        //        });
-        //    }
+            if (isUserAnAdmin)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = $"The user {currentUser.Email} is an admin"
+                });
+            }
+            else
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"The user {currentUser.Email} is NOT an admin"
+                });
+            }
 
-        //    return StatusCode(StatusCodes.Status500InternalServerError, new
-        //    {
-        //        success = false,
-        //        description = "The database is currently unavailable"
-        //    });
-        //}
+            //return StatusCode(StatusCodes.Status500InternalServerError, new
+            //{
+            //    success = false,
+            //    description = "The database is currently unavailable"
+            //});
+        }
 
        //[HttpGet]
        //public Task<IActionResult> GetAll([FromBody] string userId)
