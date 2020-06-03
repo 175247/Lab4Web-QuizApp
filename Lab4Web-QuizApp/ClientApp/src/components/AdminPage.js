@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
+import Question from "./Question";
 
 class AdminPage extends Component {
   constructor(props) {
@@ -19,10 +20,11 @@ class AdminPage extends Component {
       isUserAnAdmin: true,
       questionData: [],
       isDatabaseSeeded: false,
-      newQuestion: false,
+      renderOption: "list",
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.fetchQuizData = this.fetchQuizData.bind(this)
   }
 
   onChange(event) {
@@ -58,6 +60,12 @@ class AdminPage extends Component {
       errors.correctAnswer = "You need to pick which answer is the correct one";
     return errors;
   };
+
+  handleQuestion = (option) => {
+    this.setState({
+      renderOption: option
+    })
+  }
 
   async fetchQuizData() {
     await fetch('questions', {
@@ -154,19 +162,44 @@ class AdminPage extends Component {
   }
 
   renderQuestionList() {
+    const questionData = this.state.questionData;
     if (!this.state.isDatabaseSeeded) {
-      //this.fetchQuizData();
+      this.fetchQuizData();
     }
+    console.log(questionData)
+    let questionList = questionData.map(question => (
+      <li>
+        {question.questionString}
+        <ol>
+          {question.answerOptions.map(answer =>
+            <li>{answer.answerString}</li>)}
+        </ol>
+        <button className="btn btn-primary" onClick={this.handleQuestion("edit", question.id)}>Edit</button>
+        <button className="btn btn-primary" onClick={this.handleQuestion("delete", question.id)}>Delete</button>
+      </li>
+    ))
     return (
-      <div>
-        <button onClick={this.onClick}>New question</button>
-        {this.state.questionData}
-      </div>
+      <ol>
+        {questionList}
+      </ol>
     )
   }
 
   renderAdmin() {
-    let adminPage = this.state.newQuestion ? this.renderNewQuestion() : this.renderQuestionList()
+    let adminPage;
+    switch (this.state.renderOption) {
+      case "list":
+        adminPage = this.renderQuestionList()
+        break;
+      case "newQuestion":
+        this.renderNewQuestion()
+        break;
+      case "edit":
+        break;
+      case "delete":
+        break;
+
+    }
     return (
       adminPage
     )
@@ -181,7 +214,6 @@ class AdminPage extends Component {
   }
   render() {
     let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
-    console.log(this.state.questionData)
     return (
       <div>
         {adminCheck}

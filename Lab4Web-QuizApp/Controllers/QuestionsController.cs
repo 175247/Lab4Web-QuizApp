@@ -59,16 +59,16 @@ namespace Lab4Web_QuizApp.Controllers
                         return NoContent();
                     }
 
-                    var response = GenerateQuestionResponse(questions);
-                    //var response = Enumerable.Range(0, questions.Count())
-                    //    .Select(index => new QuestionResponse
-                    //    {
-                    //        RequestTime = DateTime.Now,
-                    //        Id = questions[index].Id,
-                    //        QuestionString = questions[index].QuestionString,
-                    //        AnswerOptions = questions[index].AnswerOptions
-                    //    })
-                    //.ToArray();
+                    //var response = GenerateQuestionResponse(questions);
+                    var response = Enumerable.Range(0, questions.Count())
+                        .Select(index => new QuestionResponse
+                        {
+                            RequestTime = DateTime.Now,
+                            Id = questions[index].Id,
+                            QuestionString = questions[index].QuestionString,
+                            AnswerOptions = questions[index].AnswerOptions
+                        })
+                    .ToArray();
 
                     return Ok(response);
                 }
