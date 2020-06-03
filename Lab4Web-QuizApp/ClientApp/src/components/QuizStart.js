@@ -77,6 +77,7 @@ class QuizStart extends Component {
     }
 
     async fetchQuizData() {
+        console.log(this.state.token)
         await fetch('questions', {
             method: 'GET',
             headers: !this.state.token ?
