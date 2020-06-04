@@ -23,12 +23,13 @@ class AdminPage extends Component {
       renderOption: "list",
       token: {},
       isAuthenticated: false,
-      isUserAnAdmin: true,
+      isUserAnAdmin: false,
       user: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.fetchQuizData = this.fetchQuizData.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   onChange(event) {
@@ -83,7 +84,7 @@ class AdminPage extends Component {
     //this.checkUserRole();
   }
 
- /* async checkUserRole() {
+  async checkUserRole() {
     //await this.getUserData();
     const token = this.state.token
     const userId = this.state.user.sub
@@ -99,11 +100,12 @@ class AdminPage extends Component {
       .then(data => {
         if (data.success) {
           this.setState({
-            isUserAnAdmin: true
+            isUserAnAdmin: true,
           })
         }
       })
-  }*/
+    //this.forceUpdate()
+  }
 
   async fetchQuizData() {
     await fetch('questions', {

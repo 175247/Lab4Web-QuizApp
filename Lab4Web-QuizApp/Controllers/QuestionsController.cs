@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
+    //[Authorize(Roles = "Administrator")]
     [Authorize]
     [Route("questions")]
     [ApiController]

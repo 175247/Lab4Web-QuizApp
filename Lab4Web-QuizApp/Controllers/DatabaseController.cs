@@ -39,17 +39,17 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 return BadRequest();
             }
-
+        
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var isUserAnAdmin = false;
             var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
-
+        
             foreach (var admins in adminRoleUsers)
             {
                 if (admins.Id == currentUser.Id)
                     isUserAnAdmin = true;
             }
-
+        
             if (isUserAnAdmin)
             {
                 return Ok(new
@@ -66,7 +66,7 @@ namespace Lab4Web_QuizApp.Controllers
                     message = $"The user {currentUser.Email} is NOT an admin"
                 });
             }
-
+        
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
                 success = false,
