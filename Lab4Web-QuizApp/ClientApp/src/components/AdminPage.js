@@ -99,10 +99,11 @@ class AdminPage extends Component {
       .then(data => {
         if (data.success) {
           this.setState({
-            isUserAnAdmin: true
+            isUserAnAdmin: true,
           })
         }
       })
+    //this.forceUpdate()
   }
 
   async fetchQuizData() {
