@@ -11,7 +11,6 @@ import {
 import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
-import authService from './api-authorization/AuthorizeService'
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -146,9 +145,9 @@ export class NavMenu extends Component {
                   <NavLink
                     tag={Link}
                     className="text-dark"
-                    to="/submit-new-question"
+                    to="/admin-page"
                   >
-                    Submit New Question
+                    AdminPage
                 </NavLink>
                 </NavItem>
                 <LoginMenu></LoginMenu>

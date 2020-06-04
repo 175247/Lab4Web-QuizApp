@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
+import authService from './api-authorization/AuthorizeService'
 
-class SubmitNewQuestion extends Component {
+class AdminPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,10 +17,19 @@ class SubmitNewQuestion extends Component {
       },
       loading: false,
       errors: {},
-      isUserAnAdmin: false
+      //isUserAnAdmin: true,
+      questionData: [],
+      isDatabaseSeeded: false,
+      renderOption: "list",
+      token: {},
+      isAuthenticated: false,
+      isUserAnAdmin: false,
+      user: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.fetchQuizData = this.fetchQuizData.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   onChange(event) {
@@ -34,7 +44,15 @@ class SubmitNewQuestion extends Component {
     this.setState({ errors });
     if (Object.keys(errors).length === 0) {
       this.props.submit(this.state.data);
+      this.onClick()
     }
+  };
+
+  onClick = () => {
+    this.setState(previousState => ({
+      newQuestion: !previousState.newQuestion,
+      data: ""
+    }))
   };
 
   validate = (data) => {
@@ -48,10 +66,62 @@ class SubmitNewQuestion extends Component {
     return errors;
   };
 
-  render() {
+  handleQuestion = (option) => {
+    this.setState({
+      renderOption: option
+    })
+  }
+
+  async getUserData() {
+    const token = await authService.getAccessToken();
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated: isAuthenticated,
+      user: user,
+      token: token
+    });
+    this.checkUserRole();
+  }
+
+  async checkUserRole() {
+    //await this.getUserData();
+    const token = this.state.token
+    const userId = this.state.user.sub
+    console.log(this.state.user)
+    console.log(userId)
+    await fetch('database', {
+      method: 'POST',
+      headers: !token ?
+        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(userId)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          this.setState({
+            isUserAnAdmin: true
+          })
+        }
+      })
+  }
+
+  async fetchQuizData() {
+    await fetch('questions', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          questionData: data,
+          isDatabaseSeeded: true,
+        })
+      });
+  }
+
+  renderQuestionForm() {
     const { data, errors } = this.state;
     return (
-      <Form onSubmit={this.onSubmit}>
+      <Form onSubmit={this.onSubmit} id="main-form">
         <Form.Field error={!!errors.question}>
           <label htmlFor="question">Question:</label>
           <br />
@@ -124,13 +194,68 @@ class SubmitNewQuestion extends Component {
         {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}{" "}
         <br />
         <Button primary>Submit question</Button>
+        <button onClick={this.onClick}>Back to the list</button>
       </Form>
     );
   }
-}
 
-SubmitNewQuestion.propTypes = {
+  renderQuestionList() {
+    const questionData = this.state.questionData;
+    if (!this.state.isDatabaseSeeded) {
+      this.fetchQuizData();
+    }
+    console.log(questionData)
+    let questionList = questionData.map(question => (
+      <li>
+        {question.questionString}
+        <ol>
+          {question.answerOptions.map(answer =>
+            <li>{answer.answerString}</li>)}
+        </ol>
+        <button className="btn btn-primary" onClick={this.handleQuestion("edit", question.id)}>Edit</button>
+        <button className="btn btn-primary" onClick={this.handleQuestion("delete", question.id)}>Delete</button>
+      </li>
+    ))
+    return (
+      <ol>
+        {questionList}
+      </ol>
+    )
+  }
+
+  renderAdmin() {
+    if (this.state.renderOption === "list") {
+      return (this.renderQuestionList())
+    }
+    else {
+      return (this.renderQuestionForm())
+    }
+  }
+
+  renderNormalUser() {
+    return (
+      <div>
+        <p>You don't have access to this page</p>
+      </div>
+    )
+  }
+
+  componentDidMount() {
+    this.getUserData();
+  }
+
+  render() {
+    let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    return (
+      <div>
+        {adminCheck}
+      </div>
+    );
+  }
+
+}
+AdminPage.propTypes = {
   submit: PropTypes.func.isRequired,
 };
 
-export default SubmitNewQuestion;
+export default AdminPage;
