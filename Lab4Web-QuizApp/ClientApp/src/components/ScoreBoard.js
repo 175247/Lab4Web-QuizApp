@@ -9,14 +9,22 @@ class ScoreBoard extends Component {
         }
     }
 
+    componentDidMount() {
+        this.fetchScore();
+    }
+
     async fetchScore() {
         await fetch('highscore')
             .then(response => response.json())
             .then(data => {
-                this.setState({
-                    highScores: data,
-                    isScoreExists: true
-                })
+                if (data.length > 0) {
+                    this.setState({
+                        highScores: data,
+                        isScoreExists: true
+                    })
+                }
+            })
+            .catch(error => {
             })
     }
 
@@ -55,8 +63,11 @@ class ScoreBoard extends Component {
     render() {
         let content = this.state.isScoreExists ?
             this.renderScores() : this.renderNoScore()
+
         return (
-            content
+            <div>
+                {content}
+            </div>
         )
     }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import Question from "./Question"
 import ScoreBoard from './ScoreBoard'
+//import authService from './api-authorization/AuthorizeService'
 
 class Quiz extends Component {
   constructor(props) {
@@ -11,6 +12,8 @@ class Quiz extends Component {
       isCorrectAnswer: false,
       score: 0,
       questionData: props.questions,
+      token: props.token,
+      user: props.user,
       quizComplete: false,
     }
     this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
@@ -31,14 +34,24 @@ class Quiz extends Component {
     }
   }
 
+  //async getUserData() {
+  //  const token = await authService.getAccessToken();
+  //  const user = await authService.getUser();
+  //  this.setState({
+  //    user: user,
+  //    token: token
+  //  });
+  //}
+
+  //async loadQuestion() {
   loadQuestion() {
+    //await this.getUserData();
     if (this.state.index === this.state.questionData.length - 1) {
-      return (
-        //<p>DISPLAY SCORE</p>
-        this.setState({
-          quizComplete: true
-        })
-      )
+      this.setState(previousState => ({
+        quizComplete: true,
+        score: previousState.score + 1
+      }))
+      this.submitScore()
     } else {
       this.setState(previousState => ({
         index: previousState.index + 1,
@@ -49,11 +62,25 @@ class Quiz extends Component {
     }
   }
 
+  async submitScore() {
+    let scoreData = [this.state.score, this.state.user.sub]
+    await fetch('highscore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scoreData)
+    })
+    //.then(response => response.JSON())
+    this.renderScore()
+  }
+
   renderScore() {
     return (
       <div>
         <p>Well done! You scored a total of {this.state.score}!</p>
-        <ScoreBoard />
+        <ScoreBoard
+          user={this.state.user}
+          score={this.state.score}
+        />
       </div>
     )
   }

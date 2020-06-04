@@ -6,7 +6,6 @@ class QuizStart extends Component {
     constructor() {
         super()
         this.state = {
-            isInitialSetup: false,
             score: 0,
             quizComplete: false,
             isDatabaseSeeded: false,
@@ -38,31 +37,12 @@ class QuizStart extends Component {
             user: user,
             token: token
         });
-        //this.checkUserRole()
-        //if (!user === null) { this.checkUserRole(); }
     }
-
-    //async checkUserRole() {
-    //    const user = this.state.user
-    //    return await fetch("database", {
-    //        method: "POST",
-    //        headers: { "Content-type": "application/json" },
-    //        body: JSON.stringify(user.sub),
-    //    })
-    //        .then((response) => response.json())
-    //        .then((data) => {
-    //            console.log(data);
-    //        })
-    //        .catch((error) => {
-    //            console.log(error);
-    //        });
-    //}
 
     async checkUserRole() {
         const token = await authService.getAccessToken();
         const userId = this.state.user.sub
-        //console.log(this.state.user)
-        //console.log(userId)
+
         await fetch('database', {
             method: 'POST',
             headers: !token ?
@@ -88,11 +68,12 @@ class QuizStart extends Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.setState({
-                    questionData: data,
-                    isDatabaseSeeded: true,
-                    isInitialSetup: true
-                })
+                if (data.length > 0) {
+                    this.setState({
+                        questionData: data,
+                        isDatabaseSeeded: true,
+                    })
+                }
             });
     }
 
@@ -135,6 +116,8 @@ class QuizStart extends Component {
                 <Quiz
                     questions={this.state.questionData}
                     handler={this.genericHandler}
+                    user={this.state.user}
+                    token={this.state.token}
                 />
             </div>
         )
@@ -169,7 +152,7 @@ class QuizStart extends Component {
     }
 
     render() {
-        const { isWantToPlay, isDatabaseSeeded, isInitialSetup } = this.state
+        const { isWantToPlay, isDatabaseSeeded } = this.state
         let buttons = isWantToPlay ?
             this.renderQuiz() : this.renderButtons(isDatabaseSeeded)
 

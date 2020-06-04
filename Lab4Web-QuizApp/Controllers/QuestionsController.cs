@@ -75,7 +75,7 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return BadRequest(exception);
+                    return BadRequest(exception.InnerException);
                 }
             }
             else // Leaving this "else" here for clarity and readability.
@@ -87,13 +87,16 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
-        //[Authorize(Roles="Administrator")]
         [HttpPost]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {
             if (request == null)
             {
-                return BadRequest(new { success = false, message = "Body cannot contain null" });
+                return BadRequest(new 
+                {
+                    success = false, 
+                    message = "Body cannot contain null" 
+                });
             }
 
             var answers = new List<Answer>();
