@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
-import Question from "./Question";
 
 class AdminPage extends Component {
   constructor(props) {
@@ -24,7 +23,8 @@ class AdminPage extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.fetchQuizData = this.fetchQuizData.bind(this)
+    this.fetchQuizData = this.fetchQuizData.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   onChange(event) {
@@ -80,7 +80,7 @@ class AdminPage extends Component {
       });
   }
 
-  renderNewQuestion() {
+  renderQuestionForm() {
     const { data, errors } = this.state;
     return (
       <Form onSubmit={this.onSubmit} id="main-form">
@@ -186,29 +186,18 @@ class AdminPage extends Component {
   }
 
   renderAdmin() {
-    let adminPage;
-    switch (this.state.renderOption) {
-      case "list":
-        adminPage = this.renderQuestionList()
-        break;
-      case "newQuestion":
-        this.renderNewQuestion()
-        break;
-      case "edit":
-        break;
-      case "delete":
-        break;
-
+    if (this.state.renderOption === "list") {
+      return (this.renderQuestionList())
     }
-    return (
-      adminPage
-    )
+    else {
+      return (this.renderQuestionForm())
+    }
   }
 
   renderNormalUser() {
     return (
       <div>
-        <p>Nej</p>
+        <p>You don't have access to this page</p>
       </div>
     )
   }
