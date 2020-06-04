@@ -24,7 +24,6 @@ class AdminPage extends Component {
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.fetchQuizData = this.fetchQuizData.bind(this);
-    this.onClick = this.onClick.bind(this);
   }
 
   onChange(event) {
@@ -39,15 +38,16 @@ class AdminPage extends Component {
     this.setState({ errors });
     if (Object.keys(errors).length === 0) {
       this.props.submit(this.state.data);
-      this.onClick()
+      this.clearInputs()
     }
   };
 
-  onClick = () => {
-    this.setState(previousState => ({
-      newQuestion: !previousState.newQuestion,
-      data: ""
-    }))
+  clearInputs = () => {
+    this.setState({
+      renderOption: "list",
+      data: {},
+      errors: {}
+    })
   };
 
   validate = (data) => {
@@ -61,7 +61,7 @@ class AdminPage extends Component {
     return errors;
   };
 
-  handleQuestion = (option) => {
+  stateHandler = (option) => {
     this.setState({
       renderOption: option
     })
@@ -78,6 +78,15 @@ class AdminPage extends Component {
           isDatabaseSeeded: true,
         })
       });
+  }
+
+  async deleteQuestion(id){
+    await fetch('questions', {
+      method: 'DELETE',
+      body: id,
+    })
+    .then(response => response.json())
+    .then(data => console.log)
   }
 
   renderQuestionForm() {
@@ -156,7 +165,7 @@ class AdminPage extends Component {
         {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}{" "}
         <br />
         <Button primary>Submit question</Button>
-        <button onClick={this.onClick}>Back to the list</button>
+        <button onClick={this.clearInputs}>Back to the list</button>
       </Form>
     );
   }
@@ -174,38 +183,63 @@ class AdminPage extends Component {
           {question.answerOptions.map(answer =>
             <li>{answer.answerString}</li>)}
         </ol>
-        <button className="btn btn-primary" onClick={this.handleQuestion("edit", question.id)}>Edit</button>
-        <button className="btn btn-primary" onClick={this.handleQuestion("delete", question.id)}>Delete</button>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("edit")}>Edit</button>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("delete")}>Delete</button>
       </li>
     ))
     return (
       <ol>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion")} >New question</button>
+        {questionList}
+      </ol>
+    )
+  }
+
+  renderDeleteQuestion() {
+    const questionData = this.state.questionData;
+    if (!this.state.isDatabaseSeeded) {
+      this.fetchQuizData();
+    }
+    console.log(questionData)
+    let questionList = questionData.map(question => (
+      <li>
+        {question.questionString}
+        <ol>
+          {question.answerOptions.map(answer =>
+            <li>{answer.answerString}</li>)}
+        </ol>
+        <button className="btn btn-primary" onClick={() => this.deleteQuestion(answer.id)}>Delete</button>
+      </li>
+    ))
+    return (
+      <ol>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion")} >New question</button>
         {questionList}
       </ol>
     )
   }
 
   renderAdmin() {
-    if (this.state.renderOption === "list") {
-      return (this.renderQuestionList())
-    }
-    else {
-      return (this.renderQuestionForm())
+    switch (this.state.renderOption) {
+      case "list":
+        return (this.renderQuestionList())
+      case "delete":
+        return (this.renderDeleteQuestion())
+      default:
+        return (this.renderQuestionForm())
     }
   }
 
   renderNormalUser() {
     return (
-      <div>
         <p>You don't have access to this page</p>
-      </div>
     )
   }
   render() {
-    let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    let adminCheckResult = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
     return (
       <div>
-        {adminCheck}
+        {adminCheckResult}
       </div>
     );
   }

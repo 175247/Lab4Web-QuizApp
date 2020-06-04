@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
@@ -59,16 +59,16 @@ namespace Lab4Web_QuizApp.Controllers
                         return NoContent();
                     }
 
-                    //var response = GenerateQuestionResponse(questions);
-                    var response = Enumerable.Range(0, questions.Count())
-                        .Select(index => new QuestionResponse
-                        {
-                            RequestTime = DateTime.Now,
-                            Id = questions[index].Id,
-                            QuestionString = questions[index].QuestionString,
-                            AnswerOptions = questions[index].AnswerOptions
-                        })
-                    .ToArray();
+                    var response = GenerateQuestionResponse(questions);
+                    //var response = Enumerable.Range(0, questions.Count())
+                    //    .Select(index => new QuestionResponse
+                    //    {
+                    //        RequestTime = DateTime.Now,
+                    //        Id = questions[index].Id,
+                    //        QuestionString = questions[index].QuestionString,
+                    //        AnswerOptions = questions[index].AnswerOptions
+                    //    })
+                    //.ToArray();
 
                     return Ok(response);
                 }
@@ -131,5 +131,19 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Question>> DeleteQuestion(int id)
+        {
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null)
+            {
+                return NotFound();
+            }
+
+            _context.Questions.Remove(question);
+            await _context.SaveChangesAsync();
+
+            return question;
+        }
     }
 }
