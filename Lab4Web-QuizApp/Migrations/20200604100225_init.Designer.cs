@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200601132118_high-score")]
-    partial class highscore
+    [Migration("20200604100225_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -257,6 +257,15 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "d71f9d41-ce82-40d9-adb0-aa8304266b75",
+                            ConcurrencyStamp = "792e250c-75f7-41d9-a3fd-1485f4908347",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

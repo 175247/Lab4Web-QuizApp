@@ -23,7 +23,7 @@ class AdminPage extends Component {
       renderOption: "list",
       token: {},
       isAuthenticated: false,
-      isUserAnAdmin: false,
+      isUserAnAdmin: true,
       user: {}
     };
     this.onChange = this.onChange.bind(this);
@@ -80,10 +80,10 @@ class AdminPage extends Component {
       user: user,
       token: token
     });
-    this.checkUserRole();
+    //this.checkUserRole();
   }
 
-  async checkUserRole() {
+ /* async checkUserRole() {
     //await this.getUserData();
     const token = this.state.token
     const userId = this.state.user.sub
@@ -103,7 +103,7 @@ class AdminPage extends Component {
           })
         }
       })
-  }
+  }*/
 
   async fetchQuizData() {
     await fetch('questions', {
@@ -124,7 +124,7 @@ class AdminPage extends Component {
       body: id,
     })
     .then(response => response.json())
-    .then(data => console.log)
+    .then(data => console.log(data))
   }
 
   renderQuestionForm() {
@@ -245,13 +245,12 @@ class AdminPage extends Component {
         <ol>
           {question.answerOptions.map(answer =>
             <li>{answer.answerString}</li>)}
+        <button className="btn btn-primary" onClick={() => this.deleteQuestion(question.id)}>Delete</button>
         </ol>
-        <button className="btn btn-primary" onClick={() => this.deleteQuestion(answer.id)}>Delete</button>
       </li>
     ))
     return (
       <ol>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion")} >New question</button>
         {questionList}
       </ol>
     )

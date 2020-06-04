@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4Web_QuizApp.Migrations
 {
-    public partial class recreatemigrations : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -200,6 +200,28 @@ namespace Lab4Web_QuizApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "HighScores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Score = table.Column<int>(nullable: false),
+                    DateSubmitted = table.Column<DateTime>(nullable: false),
+                    Username = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HighScores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HighScores_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Answers",
                 columns: table => new
                 {
@@ -219,6 +241,11 @@ namespace Lab4Web_QuizApp.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "d71f9d41-ce82-40d9-adb0-aa8304266b75", "792e250c-75f7-41d9-a3fd-1485f4908347", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
@@ -276,6 +303,11 @@ namespace Lab4Web_QuizApp.Migrations
                 column: "Expiration");
 
             migrationBuilder.CreateIndex(
+                name: "IX_HighScores_UserId",
+                table: "HighScores",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PersistedGrants_Expiration",
                 table: "PersistedGrants",
                 column: "Expiration");
@@ -308,6 +340,9 @@ namespace Lab4Web_QuizApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "DeviceCodes");
+
+            migrationBuilder.DropTable(
+                name: "HighScores");
 
             migrationBuilder.DropTable(
                 name: "PersistedGrants");
