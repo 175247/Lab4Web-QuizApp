@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
+import authService from './api-authorization/AuthorizeService'
 
 class AdminPage extends Component {
   constructor(props) {
@@ -16,10 +17,14 @@ class AdminPage extends Component {
       },
       loading: false,
       errors: {},
-      isUserAnAdmin: true,
+      //isUserAnAdmin: true,
       questionData: [],
       isDatabaseSeeded: false,
       renderOption: "list",
+      token: {},
+      isAuthenticated: false,
+      isUserAnAdmin: false,
+      user: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -65,6 +70,39 @@ class AdminPage extends Component {
     this.setState({
       renderOption: option
     })
+  }
+
+  async getUserData() {
+    const token = await authService.getAccessToken();
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated: isAuthenticated,
+      user: user,
+      token: token
+    });
+    this.checkUserRole();
+  }
+
+  async checkUserRole() {
+    //await this.getUserData();
+    const token = this.state.token
+    const userId = this.state.user.sub
+    console.log(this.state.user)
+    console.log(userId)
+    await fetch('database', {
+      method: 'POST',
+      headers: !token ?
+        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(userId)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          this.setState({
+            isUserAnAdmin: true
+          })
+        }
+      })
   }
 
   async fetchQuizData() {
@@ -235,6 +273,11 @@ class AdminPage extends Component {
         <p>You don't have access to this page</p>
     )
   }
+
+  componentDidMount() {
+    this.getUserData();
+  }
+
   render() {
     let adminCheckResult = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
     return (
