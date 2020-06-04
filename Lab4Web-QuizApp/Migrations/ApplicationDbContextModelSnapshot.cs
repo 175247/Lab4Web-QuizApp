@@ -259,8 +259,8 @@ namespace Lab4Web_QuizApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "dbeb5451-7050-44a8-bf40-9ff540ea686d",
-                            ConcurrencyStamp = "119eaa89-af30-4bc4-8522-b1368153fed6",
+                            Id = "e80305ae-b49f-4b75-8386-93d1c7b52665",
+                            ConcurrencyStamp = "c5b83a5d-c86d-427e-9d47-0600d1deb6b4",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

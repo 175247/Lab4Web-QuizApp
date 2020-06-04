@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200604100225_init")]
-    partial class init
+    [Migration("20200604120100_merge")]
+    partial class merge
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -261,8 +261,8 @@ namespace Lab4Web_QuizApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d71f9d41-ce82-40d9-adb0-aa8304266b75",
-                            ConcurrencyStamp = "792e250c-75f7-41d9-a3fd-1485f4908347",
+                            Id = "e80305ae-b49f-4b75-8386-93d1c7b52665",
+                            ConcurrencyStamp = "c5b83a5d-c86d-427e-9d47-0600d1deb6b4",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -319,12 +319,10 @@ namespace Lab4Web_QuizApp.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -361,12 +359,10 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

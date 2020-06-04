@@ -17,22 +17,22 @@ class AdminPage extends Component {
       },
       loading: false,
       errors: {},
-      //isUserAnAdmin: true,
       questionData: [],
       isDatabaseSeeded: false,
       renderOption: "list",
       token: {},
       isAuthenticated: false,
       isUserAnAdmin: false,
-      user: {}
+      user: {},
+      chosenQuestionId: 0,
     };
-    this.onChange = this.onChange.bind(this);
+    this.onChangeHandler = this.onChangeHandler.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.fetchQuizData = this.fetchQuizData.bind(this);
-    this.onClick = this.onClick.bind(this);
+    this.clearInputs = this.clearInputs.bind(this);
   }
 
-  onChange(event) {
+  onChangeHandler(event) {
     const { name, value } = event.target;
     this.setState({
       data: { ...this.state.data, [name]: value },
@@ -43,8 +43,17 @@ class AdminPage extends Component {
     const errors = this.validate(this.state.data);
     this.setState({ errors });
     if (Object.keys(errors).length === 0) {
-      this.props.submit(this.state.data);
+      if (this.state.renderOption === "newQuestion") {
+        this.props.submitNewQuestion(this.state.data);
+      }
+      else{
+        this.props.submitQuestionChanges(this.state.data, this.state.chosenQuestionId);
+        this.setState({
+          renderOption: "list"
+        })
+      }
       this.clearInputs()
+      this.fetchQuizData();
     }
   };
 
@@ -67,12 +76,21 @@ class AdminPage extends Component {
     return errors;
   };
 
-  stateHandler = (option) => {
+  stateHandler = (option, questionData) => {
     this.setState({
-      renderOption: option
+      renderOption: option,
+      chosenQuestionId: questionData.id
+    })
+    if(questionData === null) return
+    this.setState(prevState => {
+      let data = { ...prevState.data };
+      data.question = questionData.questionString; 
+      data.answer1 = questionData.answerOptions[0].answerString;
+      data.answer2 = questionData.answerOptions[1].answerString;
+      data.answer3 = questionData.answerOptions[2].answerString;
+      return { data };
     })
   }
-
   async getUserData() {
     const token = await authService.getAccessToken();
     const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
@@ -81,15 +99,16 @@ class AdminPage extends Component {
       user: user,
       token: token
     });
-    //this.checkUserRole();
+    if (this.state.user === null) {
+      return(<></>)
+    }
+    this.checkUserRole();
   }
 
   async checkUserRole() {
     //await this.getUserData();
     const token = this.state.token
     const userId = this.state.user.sub
-    console.log(this.state.user)
-    console.log(userId)
     await fetch('database', {
       method: 'POST',
       headers: !token ?
@@ -120,19 +139,25 @@ class AdminPage extends Component {
       });
   }
 
-  async deleteQuestion(id){
-    await fetch('questions', {
+  async deleteQuestion(){
+    await fetch('questions/' + this.state.chosenQuestionId, {
       method: 'DELETE',
-      body: id,
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8' 
+       },
     })
     .then(response => response.json())
-    .then(data => console.log(data))
+    this.fetchQuizData();
   }
 
   renderQuestionForm() {
+    let submitButton =  <Button  className="btn btn-primary" primary>Submit question</Button>
+    if (this.state.renderOption === "edit") {
+      submitButton =  <Button  className="btn btn-primary" primary>Submit changes</Button>
+    }
     const { data, errors } = this.state;
     return (
-      <Form onSubmit={this.onSubmit} id="main-form">
+      <Form onSubmit={()=> this.onSubmit()} id="main-form">
         <Form.Field error={!!errors.question}>
           <label htmlFor="question">Question:</label>
           <br />
@@ -141,7 +166,7 @@ class AdminPage extends Component {
             id="question"
             name="question"
             value={data.question}
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           {errors.question && <InlineError text={errors.question} />}
         </Form.Field>
@@ -153,14 +178,14 @@ class AdminPage extends Component {
             id="answer1"
             name="answer1"
             value={data.answer1}
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           <input
             type="radio"
             id="answer1radio"
             name="correctAnswer"
             value="answer1"
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           {errors.answer1 && <InlineError text={errors.answer1} />}
         </Form.Field>
@@ -172,14 +197,14 @@ class AdminPage extends Component {
             id="answer2"
             name="answer2"
             value={data.answer2}
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           <input
             type="radio"
             id="answer2radio"
             name="correctAnswer"
             value="answer2"
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           {errors.answer2 && <InlineError text={errors.answer2} />}
         </Form.Field>
@@ -191,31 +216,30 @@ class AdminPage extends Component {
             id="answer3"
             name="answer3"
             value={data.answer3}
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           <input
             type="radio"
             id="answer3radio"
             name="correctAnswer"
             value="answer3"
-            onChange={this.onChange}
+            onChange={this.onChangeHandler}
           />
           {errors.answer3 && <InlineError text={errors.answer3} />}
         </Form.Field>
-        {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}{" "}
+        {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
         <br />
-        <Button primary>Submit question</Button>
-        <button onClick={this.clearInputs}>Back to the list</button>
+        {submitButton}
+        <button  className="btn btn-primary" onClick={this.clearInputs}>Back to the list</button>
       </Form>
     );
   }
 
   renderQuestionList() {
-    const questionData = this.state.questionData;
     if (!this.state.isDatabaseSeeded) {
       this.fetchQuizData();
     }
-    console.log(questionData)
+    const questionData = this.state.questionData;
     let questionList = questionData.map(question => (
       <li>
         {question.questionString}
@@ -223,38 +247,37 @@ class AdminPage extends Component {
           {question.answerOptions.map(answer =>
             <li>{answer.answerString}</li>)}
         </ol>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("edit")}>Edit</button>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("delete")}>Delete</button>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("edit", question)}>Edit</button>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("delete", question)}>Delete</button>
       </li>
     ))
     return (
       <ol>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion")} >New question</button>
+        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion", null)} >New question</button>
         {questionList}
       </ol>
     )
   }
 
   renderDeleteQuestion() {
-    const questionData = this.state.questionData;
     if (!this.state.isDatabaseSeeded) {
       this.fetchQuizData();
     }
-    console.log(questionData)
-    let questionList = questionData.map(question => (
-      <li>
-        {question.questionString}
+    let question = this.state.questionData.find(question => question.id === this.state.chosenQuestionId)
+    return (
+      <div>
+        <p>Question: {question.questionString}</p>
+        <p>ID: {question.id}</p>
         <ol>
+          Answers: 
           {question.answerOptions.map(answer =>
             <li>{answer.answerString}</li>)}
-        <button className="btn btn-primary" onClick={() => this.deleteQuestion(question.id)}>Delete</button>
+            <br/>
+        <button className="btn btn-primary" onClick={() => this.deleteQuestion()}>Delete</button>
         </ol>
-      </li>
-    ))
-    return (
-      <ol>
-        {questionList}
-      </ol>
+        <button  className="btn btn-primary" onClick={this.clearInputs}>Back to the list</button>
+      </div>
+      
     )
   }
 
@@ -290,7 +313,7 @@ class AdminPage extends Component {
 
 }
 AdminPage.propTypes = {
-  submit: PropTypes.func.isRequired,
+  submitNewQuestion: PropTypes.func.isRequired,
 };
 
 export default AdminPage;

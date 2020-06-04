@@ -146,5 +146,33 @@ namespace Lab4Web_QuizApp.Controllers
 
             return question;
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateQuestion([FromBody] Question request, int id)
+        {
+            if (request == null)
+            {
+                return BadRequest(new { success = false, message = "Body cannot contain null" });
+            }
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(request).State = EntityState.Modified;
+
+            try
+            { 
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+                {
+                    message = "The database is currently unavailable.",
+                    Description = exception.InnerException
+                });
+            }
+            return NoContent();
+        }
     }
 }

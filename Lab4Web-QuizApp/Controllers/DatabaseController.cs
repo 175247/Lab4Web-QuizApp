@@ -158,6 +158,11 @@ namespace Lab4Web_QuizApp.Controllers
                         {
                             AnswerString = "...the other one?",
                             IsCorrectAnswer = false
+                        },
+                        new Answer
+                        {
+                            AnswerString = "Simon",
+                            IsCorrectAnswer = false
                         }
                     }
                 }
