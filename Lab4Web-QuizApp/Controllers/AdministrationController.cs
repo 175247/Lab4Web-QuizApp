@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
+    //public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
     [Authorize(Roles = "Administrator")]
     [Route("administration")]
     [ApiController]
@@ -23,7 +23,7 @@ namespace Lab4Web_QuizApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private RoleCheckReturnTypes roleCheckResult;
+        //private RoleCheckReturnTypes roleCheckResult;
 
         public AdministrationController(ApplicationDbContext context,
             RoleManager<IdentityRole> roleManager,

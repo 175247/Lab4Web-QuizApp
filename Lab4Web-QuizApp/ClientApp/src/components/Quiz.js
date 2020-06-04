@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import Question from "./Question"
 import ScoreBoard from './ScoreBoard'
-//import authService from './api-authorization/AuthorizeService'
+import authService from './api-authorization/AuthorizeService'
 
 class Quiz extends Component {
   constructor(props) {
@@ -12,12 +12,27 @@ class Quiz extends Component {
       isCorrectAnswer: false,
       score: 0,
       questionData: props.questions,
-      token: props.token,
-      user: props.user,
+      token: {},
+      user: {},
       quizComplete: false,
+      isAuthenticated: false
     }
     this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
     this.renderScore = this.renderScore.bind(this)
+  }
+
+  async getUserData() {
+    const token = await authService.getAccessToken();
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated: isAuthenticated,
+      user: user,
+      token: token
+    });
+  }
+
+  componentDidMount() {
+    this.getUserData()
   }
 
   handleAnswerSelection(selectedAnswer) {
@@ -51,7 +66,7 @@ class Quiz extends Component {
         quizComplete: true,
         score: previousState.score + 1
       }))
-      this.submitScore()
+      //this.submitScore()
     } else {
       this.setState(previousState => ({
         index: previousState.index + 1,
@@ -62,11 +77,17 @@ class Quiz extends Component {
     }
   }
 
-  async submitScore() {
-    let scoreData = [this.state.score, this.state.user.sub]
-    await fetch('highscore', {
+  submitScore() {
+    console.log(this.state.score)
+    console.log(this.state.user.sub)
+    let score = this.state.score
+    let userId = this.state.user.sub
+    let scoreData = { score, userId }
+
+    fetch('highscore', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: !this.state.token ?
+        {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
       body: JSON.stringify(scoreData)
     })
     //.then(response => response.JSON())
@@ -85,22 +106,31 @@ class Quiz extends Component {
     )
   }
 
+  renderForbidden() {
+    return (
+      <p>Please login to proceed.</p>
+    )
+  }
+
   render() {
     let index = this.state.index
     let data = this.state.questionData[index]
 
     let content = this.state.quizComplete ?
-      this.renderScore() : <Question
+      this.submitScore() : <Question
         question={data}
         handler={this.handleAnswerSelection}
       />
 
+    let allowedOrNot = this.state.isAuthenticated ? content : this.renderForbidden();
+
     let answerStatus = this.state.invalidAnswer ?
       <h1>Damn son, wrong answer...</h1> : null
 
+    //{content}
     return (
       <div>
-        {content}
+        {allowedOrNot}
         {answerStatus}
       </div>
     )

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("highscore")]
     [ApiController]
     public class HighScoresController : ControllerBase
@@ -45,6 +45,7 @@ namespace Lab4Web_QuizApp.Controllers
                             .Select(index => new HighScoreResponse
                             {
                                 Id = highScore[index].Id,
+                                DateSubmitted = highScore[index].DateSubmitted,
                                 Score = highScore[index].Score,
                                 Username = highScore[index].Username
                             })
@@ -89,7 +90,7 @@ namespace Lab4Web_QuizApp.Controllers
                     var highScore = new HighScore
                     {
                         Score = request.Score,
-                        DateSubmitted = DateTime.Now,
+                        DateSubmitted = DateTime.Now.ToString("dddd, dd MMMM yyyy"),
                         Username = currentUser.Email,
                         User = currentUser
                     };

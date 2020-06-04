@@ -36,7 +36,7 @@ namespace Lab4Web_QuizApp.Controllers
             var response = Enumerable.Range(0, question.Count())
                         .Select(index => new QuestionResponse
                         {
-                            RequestTime = DateTime.Now,
+                            RequestTime = DateTime.Now.ToString("dddd, dd MMMM yyyy"),
                             Id = question[index].Id,
                             QuestionString = question[index].QuestionString,
                             AnswerOptions = question[index].AnswerOptions

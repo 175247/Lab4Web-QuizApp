@@ -24,8 +24,7 @@ class QuizStart extends Component {
     }
 
     componentDidMount() {
-        this.fetchQuizData();
-        this.getUserData();
+        //this.getUserData();
         this.checkUserRole();
     }
 
@@ -40,23 +39,28 @@ class QuizStart extends Component {
     }
 
     async checkUserRole() {
-        const token = await authService.getAccessToken();
-        const userId = this.state.user.sub
+        await this.getUserData();
+        //const token = await authService.getAccessToken();
+        //const userId = this.state.user.sub
+        const { token, user } = this.state;
 
-        await fetch('database', {
-            method: 'POST',
-            headers: !token ?
-                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(userId)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.setState({
-                        isUserAnAdmin: true
-                    })
-                }
+        if (user != null) {
+            await fetch('database', {
+                method: 'POST',
+                headers: !token ?
+                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(user.sub)
             })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.setState({
+                            isUserAnAdmin: true
+                        })
+                    }
+                })
+            this.fetchQuizData();
+        }
     }
 
     async fetchQuizData() {
@@ -152,13 +156,15 @@ class QuizStart extends Component {
     }
 
     render() {
-        const { isWantToPlay, isDatabaseSeeded } = this.state
+        const { isAuthenticated, isWantToPlay, isDatabaseSeeded } = this.state
         let buttons = isWantToPlay ?
             this.renderQuiz() : this.renderButtons(isDatabaseSeeded)
+        let content = isAuthenticated ? buttons : <p>Please login before proceeding.</p>
 
+        //{buttons}
         return (
             <div>
-                {buttons}
+                {content}
             </div>
         )
     }

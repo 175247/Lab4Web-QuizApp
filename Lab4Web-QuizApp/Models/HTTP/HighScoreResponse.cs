@@ -9,7 +9,7 @@ namespace Lab4Web_QuizApp.Models
     {
         public int Id { get; set; }
         public int Score { get; set; }
-        public DateTime DateSubmitted { get; set; }
+        public string DateSubmitted { get; set; }
         public string Username { get; set; }
     }
 }
