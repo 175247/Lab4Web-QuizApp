@@ -24,7 +24,7 @@ class AdminPage extends Component {
       isAuthenticated: false,
       isUserAnAdmin: false,
       user: {},
-      chosenQuestionId: 0,
+      chosenQuestion: {},
     };
     this.onChangeHandler = this.onChangeHandler.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -47,13 +47,10 @@ class AdminPage extends Component {
         this.props.submitNewQuestion(this.state.data);
       }
       else{
-        this.props.submitQuestionChanges(this.state.data, this.state.chosenQuestionId);
-        this.setState({
-          renderOption: "list"
-        })
+        this.props.submitQuestionChanges(this.state.data, this.state.chosenQuestion);
       }
-      this.clearInputs()
       this.fetchQuizData();
+      this.clearInputs()
     }
   };
 
@@ -79,16 +76,18 @@ class AdminPage extends Component {
   stateHandler = (option, questionData) => {
     this.setState({
       renderOption: option,
-      chosenQuestionId: questionData.id
     })
     if(questionData === null) return
     this.setState(prevState => {
       let data = { ...prevState.data };
-      data.question = questionData.questionString; 
+      data.question = questionData.questionString;
       data.answer1 = questionData.answerOptions[0].answerString;
       data.answer2 = questionData.answerOptions[1].answerString;
       data.answer3 = questionData.answerOptions[2].answerString;
       return { data };
+    })
+    this.setState({
+      chosenQuestion: questionData,
     })
   }
   async getUserData() {
@@ -127,20 +126,36 @@ class AdminPage extends Component {
   }
 
   async fetchQuizData() {
-    await fetch('questions', {
-      method: 'GET',
-    })
-      .then(response => response.json())
-      .then(data => {
-        this.setState({
-          questionData: data,
-          isDatabaseSeeded: true,
-        })
-      });
+    try
+    {
+      await fetch('questions', {
+        method: 'GET',
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.setState({
+            questionData: data,
+            isDatabaseSeeded: true,
+          })
+        });
+    }
+    catch{
+      alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
+      this.seedDatabase()
+    }
   }
+  async seedDatabase() {
+    const token = await authService.getAccessToken();
+    await fetch('database', {
+        method: 'PUT',
+        headers: !token ?
+            {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+    })
+    this.fetchQuizData()
+}
 
   async deleteQuestion(){
-    await fetch('questions/' + this.state.chosenQuestionId, {
+    await fetch('questions/' + this.state.chosenQuestion.id, {
       method: 'DELETE',
       headers: {
         'Content-type': 'application/json; charset=UTF-8' 
@@ -148,6 +163,9 @@ class AdminPage extends Component {
     })
     .then(response => response.json())
     this.fetchQuizData();
+    this.setState({
+      renderOption: "list",
+    })
   }
 
   renderQuestionForm() {
@@ -263,7 +281,7 @@ class AdminPage extends Component {
     if (!this.state.isDatabaseSeeded) {
       this.fetchQuizData();
     }
-    let question = this.state.questionData.find(question => question.id === this.state.chosenQuestionId)
+    let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
     return (
       <div>
         <p>Question: {question.questionString}</p>

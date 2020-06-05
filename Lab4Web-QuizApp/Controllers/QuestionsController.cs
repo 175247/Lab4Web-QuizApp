@@ -159,6 +159,10 @@ namespace Lab4Web_QuizApp.Controllers
             }
 
             _context.Entry(request).State = EntityState.Modified;
+            foreach (var answer in request.AnswerOptions)
+            {
+                _context.Entry(answer).State = EntityState.Modified;
+            }
 
             try
             { 
