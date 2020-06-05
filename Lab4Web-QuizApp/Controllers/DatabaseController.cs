@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Authorize(Roles ="Administrator")]
+    //[Authorize(Roles ="Administrator")]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -43,7 +43,7 @@ namespace Lab4Web_QuizApp.Controllers
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var isUserAnAdmin = false;
             var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
-            
+        
             foreach (var admins in adminRoleUsers)
             {
                 if (admins.Id == currentUser.Id)
@@ -66,7 +66,7 @@ namespace Lab4Web_QuizApp.Controllers
                     message = $"The user {currentUser.Email} is NOT an admin"
                 });
             }
-            
+        
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
                 success = false,
@@ -157,6 +157,11 @@ namespace Lab4Web_QuizApp.Controllers
                         new Answer
                         {
                             AnswerString = "...the other one?",
+                            IsCorrectAnswer = false
+                        },
+                        new Answer
+                        {
+                            AnswerString = "Simon",
                             IsCorrectAnswer = false
                         }
                     }

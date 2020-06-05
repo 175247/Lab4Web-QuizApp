@@ -61,8 +61,8 @@ class QuizStart extends Component {
     async checkUserRole() {
         const token = await authService.getAccessToken();
         const userId = this.state.user.sub
-        console.log(this.state.user)
-        console.log(userId)
+        //console.log(this.state.user)
+        //console.log(userId)
         await fetch('database', {
             method: 'POST',
             headers: !token ?
@@ -97,36 +97,39 @@ class QuizStart extends Component {
     }
 
     async seedDatabase() {
-        //    const token = await authService.getAccessToken();
-        //    await fetch('database', {
-        //        method: 'PUT',
-        //        headers: !token ?
-        //            {} : { 'Authorization': `Bearer ${token}` }
+        const token = await authService.getAccessToken();
+        await fetch('database', {
+            method: 'PUT',
+            headers: !token ?
+                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    seedStatus: data.description
+                })
+            })
+        //.catch(error => {
+        //    console.log(error)
+        //});
+        // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
+        //await fetch('database', {
+        //    method: 'POST',
+        //    headers: !token ?
+        //        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+        //})
+        //    .then(response => response.json())
+        //    .then(data => {
+        //        console.log(data)
         //    })
-        //        .then(response => response.json())
-        //        .then(data => {
-        //            this.setState({
-        //                seedStatus: data.description
-        //            })
-        //        })
-        //        .catch(error => {
-        //            console.log(error)
-        //        });
-        //
-        //    await fetch('database', {
-        //        method: 'POST',
-        //        headers: !token ?
-        //            {} : { 'Authorization': `Bearer ${token}` }
-        //    })
-        //        .then(response => response.json())
-        //        .then(data => {
-        //            console.log(data)
-        //        })
 
         this.fetchQuizData()
     }
 
     renderQuiz() {
+        if (this.state.questionData == null) {
+            this.state.renderButtons()
+        }
         return (
             <div>
                 <Quiz

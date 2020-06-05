@@ -19,7 +19,8 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Administrator")]
+    [Authorize]
     [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
@@ -131,5 +132,51 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Question>> DeleteQuestion(int id)
+        {
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null)
+            {
+                return NotFound();
+            }
+
+            _context.Questions.Remove(question);
+            await _context.SaveChangesAsync();
+
+            return question;
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateQuestion([FromBody] Question request, int id)
+        {
+            if (request == null)
+            {
+                return BadRequest(new { success = false, message = "Body cannot contain null" });
+            }
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(request).State = EntityState.Modified;
+            foreach (var answer in request.AnswerOptions)
+            {
+                _context.Entry(answer).State = EntityState.Modified;
+            }
+
+            try
+            { 
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+                {
+                    message = "The database is currently unavailable.",
+                    Description = exception.InnerException
+                });
+            }
+            return NoContent();
+        }
     }
 }

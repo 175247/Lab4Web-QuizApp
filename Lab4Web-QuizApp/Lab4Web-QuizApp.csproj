@@ -49,6 +49,8 @@
     <Compile Remove="Migrations\20200525110530_AddQuestionsAndAnswers.Designer.cs" />
     <Compile Remove="Migrations\20200525111726_AddQuestionsAndAnswers.cs" />
     <Compile Remove="Migrations\20200525111726_AddQuestionsAndAnswers.Designer.cs" />
+    <Compile Remove="Migrations\20200604100037_init.cs" />
+    <Compile Remove="Migrations\20200604100037_init.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
