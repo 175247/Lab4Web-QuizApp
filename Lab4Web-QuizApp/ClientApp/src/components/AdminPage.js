@@ -3,6 +3,7 @@ import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import InlineError from "./InlineError";
 import authService from './api-authorization/AuthorizeService'
+import DeleteQuestion from './DeleteQuestion'
 
 class AdminPage extends Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class AdminPage extends Component {
     this.onChangeHandler = this.onChangeHandler.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.fetchQuizData = this.fetchQuizData.bind(this);
-    this.clearInputs = this.clearInputs.bind(this);
+    this.resetPage = this.resetPage.bind(this);
   }
 
   onChangeHandler(event) {
@@ -49,17 +50,17 @@ class AdminPage extends Component {
       else{
         this.props.submitQuestionChanges(this.state.data, this.state.chosenQuestion);
       }
-      this.fetchQuizData();
-      this.clearInputs()
+      this.resetPage();
     }
   };
 
-  clearInputs = () => {
+  async resetPage ()  {
     this.setState({
       renderOption: "list",
       data: {},
       errors: {}
     })
+    await this.fetchQuizData();
   };
 
   validate = (data) => {
@@ -133,13 +134,15 @@ class AdminPage extends Component {
       })
         .then(response => response.json())
         .then(data => {
+          console.log(data)
           this.setState({
             questionData: data,
             isDatabaseSeeded: true,
           })
         });
     }
-    catch{
+    catch(e){
+      console.log(e)
       alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
       this.seedDatabase()
     }
@@ -153,20 +156,6 @@ class AdminPage extends Component {
     })
     this.fetchQuizData()
 }
-
-  async deleteQuestion(){
-    await fetch('questions/' + this.state.chosenQuestion.id, {
-      method: 'DELETE',
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8' 
-       },
-    })
-    .then(response => response.json())
-    this.fetchQuizData();
-    this.setState({
-      renderOption: "list",
-    })
-  }
 
   renderQuestionForm() {
     let submitButton =  <Button  className="btn btn-primary" primary>Submit question</Button>
@@ -248,7 +237,7 @@ class AdminPage extends Component {
         {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
         <br />
         {submitButton}
-        <button  className="btn btn-primary" onClick={this.clearInputs}>Back to the list</button>
+        <button  className="btn btn-primary" onClick={this.resetPage}>Back to the list</button>
       </Form>
     );
   }
@@ -277,34 +266,13 @@ class AdminPage extends Component {
     )
   }
 
-  renderDeleteQuestion() {
-    if (!this.state.isDatabaseSeeded) {
-      this.fetchQuizData();
-    }
-    let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
-    return (
-      <div>
-        <p>Question: {question.questionString}</p>
-        <p>ID: {question.id}</p>
-        <ol>
-          Answers: 
-          {question.answerOptions.map(answer =>
-            <li>{answer.answerString}</li>)}
-            <br/>
-        <button className="btn btn-primary" onClick={() => this.deleteQuestion()}>Delete</button>
-        </ol>
-        <button  className="btn btn-primary" onClick={this.clearInputs}>Back to the list</button>
-      </div>
-      
-    )
-  }
-
   renderAdmin() {
     switch (this.state.renderOption) {
       case "list":
         return (this.renderQuestionList())
       case "delete":
-        return (this.renderDeleteQuestion())
+        let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
+        return <DeleteQuestion question={question} resetPage={this.resetPage}/>
       default:
         return (this.renderQuestionForm())
     }
