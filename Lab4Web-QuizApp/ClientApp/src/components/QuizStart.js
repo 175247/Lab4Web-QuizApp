@@ -61,8 +61,6 @@ class QuizStart extends Component {
     async checkUserRole() {
         const token = await authService.getAccessToken();
         const userId = this.state.user.sub
-        //console.log(this.state.user)
-        //console.log(userId)
         await fetch('database', {
             method: 'POST',
             headers: !token ?
