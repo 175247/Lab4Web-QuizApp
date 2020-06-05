@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4Web_QuizApp.Migrations
 {
-    public partial class merge : Migration
+    public partial class MergeLunaTo5Jue : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -139,8 +139,8 @@ namespace Lab4Web_QuizApp.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(nullable: false),
-                    ProviderKey = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
+                    ProviderKey = table.Column<string>(maxLength: 128, nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false)
                 },
@@ -184,8 +184,8 @@ namespace Lab4Web_QuizApp.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
-                    LoginProvider = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
+                    Name = table.Column<string>(maxLength: 128, nullable: false),
                     Value = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -206,7 +206,7 @@ namespace Lab4Web_QuizApp.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Score = table.Column<int>(nullable: false),
-                    DateSubmitted = table.Column<DateTime>(nullable: false),
+                    DateSubmitted = table.Column<string>(nullable: true),
                     Username = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: true)
                 },
@@ -245,7 +245,7 @@ namespace Lab4Web_QuizApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "e80305ae-b49f-4b75-8386-93d1c7b52665", "c5b83a5d-c86d-427e-9d47-0600d1deb6b4", "Administrator", "ADMINISTRATOR" });
+                values: new object[] { "6ebe2fae-666e-4cd6-982f-714b217d74e7", "04705cb5-7b76-4d25-9abd-d139cea3b86f", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",

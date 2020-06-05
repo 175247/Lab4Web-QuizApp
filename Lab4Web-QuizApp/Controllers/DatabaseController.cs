@@ -40,29 +40,30 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 return BadRequest();
             }
+        
             try
             {
-
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var user = _context.Users.Find(claim.Value);
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            if (roles.Contains("Administrator"))
-            {
-                return Ok(new
+        
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                var user = _context.Users.Find(claim.Value);
+        
+                var roles = await _userManager.GetRolesAsync(user);
+        
+                if (roles.Contains("Administrator"))
                 {
-                    success = true
+                    return Ok(new
+                    {
+                        success = true
+                    });
+                }
+        
+                return Unauthorized(new
+                {
+                    success = "false"
                 });
             }
-
-            return Unauthorized(new
-            {
-                success = "false"
-            });
-            }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
