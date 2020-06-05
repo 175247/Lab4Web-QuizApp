@@ -1,4 +1,4 @@
-export default async function Submit(inputData) {
+export default async function SubmitNewQuestion(inputData) {
   const QuestionString = inputData.question;
   const answer1 = { Answerstring: inputData.answer1, IsCorrectAnswer: false };
   const answer2 = { AnswerString: inputData.answer2, IsCorrectAnswer: false };
@@ -18,14 +18,12 @@ export default async function Submit(inputData) {
 
     default:
       console.log("no correct answer");
-      break;
+      return
   }
   const request = {
     QuestionString: QuestionString,
     AnswerOptions: [answer1, answer2, answer3],
   };
-  console.log(request);
-  console.log(JSON.stringify(request));
   return await fetch("questions", {
     method: "POST",
     headers: { "Content-type": "application/json" },

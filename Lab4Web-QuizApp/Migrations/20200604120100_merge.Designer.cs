@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200605104202_init")]
-    partial class init
+    [Migration("20200604120100_merge")]
+    partial class merge
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -198,8 +198,8 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("DateSubmitted")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DateSubmitted")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Score")
                         .HasColumnType("int");
@@ -261,8 +261,8 @@ namespace Lab4Web_QuizApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4517220f-5c01-4117-a646-40ab201d3847",
-                            ConcurrencyStamp = "258f6823-0996-4a05-8f59-592c42cec14b",
+                            Id = "e80305ae-b49f-4b75-8386-93d1c7b52665",
+                            ConcurrencyStamp = "c5b83a5d-c86d-427e-9d47-0600d1deb6b4",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -319,12 +319,10 @@ namespace Lab4Web_QuizApp.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -361,12 +359,10 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

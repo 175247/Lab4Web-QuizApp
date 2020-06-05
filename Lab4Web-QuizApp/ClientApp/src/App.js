@@ -10,7 +10,8 @@ import { ApplicationPaths } from "./components/api-authorization/ApiAuthorizatio
 import QuizStart from "./components/QuizStart";
 import Quiz from "./components/Quiz";
 import AdminPage from "./components/AdminPage";
-import Submit from "./components/Submit";
+import SubmitNewQuestion from "./components/SubmitNewQuestion";
+import SubmitQuestionChanges from "./components/SubmitQuestionChanges"
 import ScoreBoard from "./components/ScoreBoard";
 
 import "./custom.css";
@@ -33,7 +34,7 @@ export default class App extends Component {
         <Route path="/quiz-start" component={QuizStart} />
         <Route
           path="/admin-page"
-          render={(props) => <AdminPage {...props} submit={Submit} />}
+          render={(props) => <AdminPage {...props} submitNewQuestion={SubmitNewQuestion} submitQuestionChanges={SubmitQuestionChanges} />}
         />
       </Layout>
     );
