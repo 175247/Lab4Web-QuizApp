@@ -80,35 +80,36 @@ class AdminPage extends Component {
       user: user,
       token: token
     });
-    this.checkUserRole();
   }
 
   async checkUserRole() {
-    //await this.getUserData();
-    const token = this.state.token
-    const userId = this.state.user.sub
-    console.log(this.state.user)
-    console.log(userId)
-    await fetch('database', {
-      method: 'POST',
-      headers: !token ?
-        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(userId)
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          this.setState({
-            isUserAnAdmin: true,
-          })
-        }
+    await this.getUserData();
+    const { token, user } = this.state;
+
+    if (user != null) {
+      await fetch('database', {
+        method: 'POST',
+        headers: !token ?
+          {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+        //body: JSON.stringify(user.sub)
       })
-    //this.forceUpdate()
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            this.setState({
+              isUserAnAdmin: true
+            })
+          }
+        })
+      this.fetchQuizData();
+    }
   }
 
   async fetchQuizData() {
     await fetch('questions', {
       method: 'GET',
+      headers: !this.state.token ?
+        {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
     })
       .then(response => response.json())
       .then(data => {
@@ -205,13 +206,12 @@ class AdminPage extends Component {
     if (!this.state.isDatabaseSeeded) {
       this.fetchQuizData();
     }
-    console.log(questionData)
     let questionList = questionData.map(question => (
-      <li>
+      <li key={question.id}>
         {question.questionString}
         <ol>
           {question.answerOptions.map(answer =>
-            <li>{answer.answerString}</li>)}
+            <li key={answer.answerString}>{answer.answerString}</li>)}
         </ol>
         <button className="btn btn-primary" onClick={this.handleQuestion("edit", question.id)}>Edit</button>
         <button className="btn btn-primary" onClick={this.handleQuestion("delete", question.id)}>Delete</button>
@@ -242,14 +242,22 @@ class AdminPage extends Component {
   }
 
   componentDidMount() {
-    this.getUserData();
+    this.checkUserRole();
+  }
+
+  renderForbidden() {
+    return (
+      <p>Please login to proceed.</p>
+    )
   }
 
   render() {
-    let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderForbidden()
+    let allowedOrNot = this.state.isAuthenticated ? adminCheck : this.renderForbidden()
+
     return (
       <div>
-        {adminCheck}
+        {allowedOrNot}
       </div>
     );
   }

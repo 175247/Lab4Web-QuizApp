@@ -9,29 +9,54 @@ using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using IdentityServer4.Extensions;
+using IdentityModel;
+using System.Security.Claims;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Authorize]
+    //[Authorize(Roles ="Administrator")]
     [Route("highscore")]
     [ApiController]
     public class HighScoresController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HighScoresController(ApplicationDbContext context)
+        public HighScoresController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
+        }
+
+        private async Task<bool> CheckUserRole()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var user = _context.Users.Find(claim.Value);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Administrator"))
+                return true;
+
+            return false;
         }
 
         // GET: api/HighScores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HighScore>>> GetHighScore()
         {
+            if (CheckUserRole().Result == false)
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 var highScore = await _context.HighScores.Include(u => u.User).ToListAsync();
-
+            
                 if (highScore.Count() == 0)
                 {
                     return NotFound(new
@@ -40,7 +65,7 @@ namespace Lab4Web_QuizApp.Controllers
                         message = "No HighScore found."
                     });
                 }
-
+            
                 var response = Enumerable.Range(0, highScore.Count())
                             .Select(index => new HighScoreResponse
                             {
@@ -50,7 +75,7 @@ namespace Lab4Web_QuizApp.Controllers
                                 Username = highScore[index].Username
                             })
                         .ToArray();
-
+            
                 return Ok(response);
             }
             catch(Exception exception)

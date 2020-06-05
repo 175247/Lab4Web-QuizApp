@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
@@ -14,7 +15,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles ="Administrator")]
+    [Authorize]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -33,50 +34,53 @@ namespace Lab4Web_QuizApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
+        public async Task<IActionResult> CheckUserRole()
         {
-            if (userId == null)
+            if (User.Identity == null)
             {
                 return BadRequest();
             }
-        
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var isUserAnAdmin = false;
-            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
-        
-            foreach (var admins in adminRoleUsers)
+            try
             {
-                if (admins.Id == currentUser.Id)
-                    isUserAnAdmin = true;
-            }
-        
-            if (isUserAnAdmin)
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var user = _context.Users.Find(claim.Value);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Administrator"))
             {
                 return Ok(new
                 {
-                    success = true,
-                    message = $"The user {currentUser.Email} is an admin"
+                    success = true
                 });
             }
-            else
+
+            return Unauthorized(new
             {
-                return NotFound(new
+                success = "false"
+            });
+            }
+            catch(Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     success = false,
-                    message = $"The user {currentUser.Email} is NOT an admin"
+                    description = exception.InnerException
                 });
             }
-        
-            return StatusCode(StatusCodes.Status500InternalServerError, new
-            {
-                success = false,
-                description = "The database is currently unavailable"
-            });
         }
 
         //[HttpPost]
         //public async Task<IActionResult> SeedAdmin()
         //{
+        //    // Workaround-
+        //    //if (User.IsInRole("Administrator"))
+        //    //{
+        //    //    
+        //    //}
+        //
         //    string roleName = "Administrator";
         //    var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
         //
@@ -119,7 +123,7 @@ namespace Lab4Web_QuizApp.Controllers
         {
             await _context.Database.MigrateAsync();
             var questionBank = await _context.Questions.Include(a => a.AnswerOptions).ToListAsync();
-        
+
             var questions = new List<Question>
             {
                 new Question
@@ -174,19 +178,7 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 try
                 {
-                    //var currentUser = await _userManager.GetUserAsync(User);
-                    //
-                    //var highScoreDummy = new HighScore
-                    //{
-                    //    DateSubmitted = DateTime.Now,
-                    //    Score = 3,
-                    //    User = currentUser,
-                    //    Username = currentUser.Email
-                    //};
-
-
                     await _context.Questions.AddRangeAsync(questions);
-                    //await _context.HighScores.AddAsync(highScoreDummy);
                     await _context.SaveChangesAsync();
 
                     return Ok(new
@@ -197,10 +189,9 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new
+                    return StatusCode(StatusCodes.Status503ServiceUnavailable, new
                     {
                         success = false,
-                        message = "The database is currently unavailable.",
                         description = exception.InnerException
                     });
                 }

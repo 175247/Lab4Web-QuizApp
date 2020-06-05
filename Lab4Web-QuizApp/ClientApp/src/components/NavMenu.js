@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
+import authService from './api-authorization/AuthorizeService'
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -21,15 +22,47 @@ export class NavMenu extends Component {
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       collapsed: true,
-      //    accessToken: [],
-      //    isUserAuthenticated: false,
-      //    currentUser: {}
+      isAuthenticated: false,
+      token: {},
+      user: {},
+      isUserAnAdmin: false
     };
   }
 
   componentDidMount() {
-    //   this.getUserData();
+    this.checkUserRole();
+  }
 
+  async getUserData() {
+    const token = await authService.getAccessToken();
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated: isAuthenticated,
+      user: user,
+      token: token
+    });
+  }
+
+  async checkUserRole() {
+    await this.getUserData();
+    const { token, user } = this.state;
+
+    if (user != null) {
+      await fetch('database', {
+        method: 'POST',
+        headers: !token ?
+          {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(user.sub)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            this.setState({
+              isUserAnAdmin: true
+            })
+          }
+        })
+    }
   }
 
   toggleNavbar() {
@@ -37,34 +70,6 @@ export class NavMenu extends Component {
       collapsed: !this.state.collapsed,
     });
   }
-
-  //async getUserData() {
-  //  const token = await authService.getAccessToken();
-  //  const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
-  //  this.setState({
-  //    isUserAuthenticated: isAuthenticated,
-  //    currentUser: user,
-  //    accessToken: token
-  //  });
-  //  this.checkUserRole();
-  //}
-
-  //async checkUserRole() {
-  //  await fetch('database', {
-  //    method: 'POST',
-  //    headers: !this.state.token ?
-  //      {} : { "Content-type": "application/json", 'Authorization': `Bearer ${this.state.token}` },
-  //    body: JSON.stringify(this.state.user)
-  //  })
-  //    .then(response => response.json())
-  //    .then(data => {
-  //      if (data.success) {
-  //        this.setState({
-  //          isUserAnAdmin: true
-  //        })
-  //      }
-  //    })
-  //}
 
   renderNavbarNormal() {
     return (
@@ -161,11 +166,14 @@ export class NavMenu extends Component {
 
 
   render() {
-    //let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
-    let adminStuff = this.renderNavbarAdmin();
+    const { isAuthenticated, isUserAnAdmin } = this.state
+
+    //let isLoggedInCheck = isAuthenticated ? this.checkUserRole() : this.renderNavbarNormal()
+    let content = isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
+
     return (
       <div>
-        {adminStuff}
+        {content}
       </div>
     );
   }
