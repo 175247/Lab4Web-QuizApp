@@ -17,6 +17,7 @@ class AdminPage extends Component {
       },
       loading: false,
       errors: {},
+      //isUserAnAdmin: true,
       questionData: [],
       isDatabaseSeeded: false,
       renderOption: "list",
@@ -90,6 +91,7 @@ class AdminPage extends Component {
       chosenQuestion: questionData,
     })
   }
+
   async getUserData() {
     const token = await authService.getAccessToken();
     const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
@@ -132,6 +134,8 @@ class AdminPage extends Component {
     {
       await fetch('questions', {
         method: 'GET',
+        headers: !this.state.token ?
+        {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' }
       })
         .then(response => response.json())
         .then(data => {
@@ -291,7 +295,7 @@ class AdminPage extends Component {
         <ol>
           Answers: 
           {question.answerOptions.map(answer =>
-            <li>{answer.answerString}</li>)}
+            <li key={answer.answerString}>{answer.answerString}</li>)}
             <br/>
         <button className="btn btn-primary" onClick={() => this.deleteQuestion()}>Delete</button>
         </ol>
@@ -312,7 +316,7 @@ class AdminPage extends Component {
     }
   }
 
-  renderNormalUser() {
+  renderForbidden() {
     return (
         <p>You don't have access to this page</p>
     )
@@ -327,7 +331,7 @@ class AdminPage extends Component {
       <p>Please login to proceed.</p>
     )
   }
-
+  
   render() {
     let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderForbidden()
     let allowedOrNot = this.state.isAuthenticated ? adminCheck : this.renderForbidden()
