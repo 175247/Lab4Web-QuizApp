@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityModel;
 using Lab4Web_QuizApp.Data;
@@ -14,8 +15,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
-    [Authorize(Roles = "Administrator")]
     [Route("administration")]
     [ApiController]
     public class AdministrationController : ControllerBase
@@ -23,7 +22,6 @@ namespace Lab4Web_QuizApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        //private RoleCheckReturnTypes roleCheckResult;
 
         public AdministrationController(ApplicationDbContext context,
             RoleManager<IdentityRole> roleManager,
@@ -34,45 +32,43 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
+        private async Task<bool> CheckUserRole()
         {
-            if (userId == null)
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var user = _context.Users.Find(claim.Value);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Administrator"))
+                return true;
+
+            return false;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HandleAdminAuthorization()
+        {
+            if (User == null)
             {
                 return BadRequest();
             }
 
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var isUserAnAdmin = false;
-            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
-
-            foreach (var admins in adminRoleUsers)
+            if (CheckUserRole().Result == false)
             {
-                if (admins.Id == currentUser.Id)
-                    isUserAnAdmin = true;
+                return Unauthorized();
             }
 
-            if (isUserAnAdmin)
-            {
-                return Ok(new
-                {
-                    success = true,
-                });
-            }
-            else
-            {
-                return Unauthorized(new 
-                {
-                    success = "false" 
-                });
-            }
+            // Else do things below. Do the above CheckUserRole().Result check for each action.
+
+            return Ok();
         }
 
-       //[HttpGet]
-       //public Task<IActionResult> GetAll([FromBody] string userId)
-       //{
-       //
-       //}
+        //[HttpGet]
+        //public Task<IActionResult> GetAll([FromBody] string userId)
+        //{
+        //
+        //}
 
         // GET api/<AdministrationController>/5
         [HttpGet("{id}")]

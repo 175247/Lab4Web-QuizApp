@@ -38,7 +38,6 @@ class ScoreBoard extends Component {
             .then(response => response.json())
             .then(data => {
                 if (data.length > 0) {
-                    console.log(data)
                     this.setState({
                         highScores: data,
                         isScoreExists: true

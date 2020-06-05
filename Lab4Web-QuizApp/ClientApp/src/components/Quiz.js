@@ -8,17 +8,19 @@ class Quiz extends Component {
     super(props)
     this.state = {
       index: 0,
-      invalidAnswer: false,
-      isCorrectAnswer: false,
       score: 0,
-      questionData: props.questions,
+      questionData: [],
       token: {},
       user: {},
-      quizComplete: false,
-      isAuthenticated: false
+      isAuthenticated: false,
+      quizComplete: false
     }
     this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
     this.renderScore = this.renderScore.bind(this)
+  }
+
+  componentDidMount() {
+    this.getUserData()
   }
 
   async getUserData() {
@@ -29,75 +31,75 @@ class Quiz extends Component {
       user: user,
       token: token
     });
+
+    await this.fetchQuizData()
   }
 
-  componentDidMount() {
-    this.getUserData()
+  async fetchQuizData() {
+    const token = await authService.getAccessToken();
+    await fetch('questions', {
+      method: 'GET',
+      headers: !token ?
+        {} : { 'Authorization': `Bearer ${token}`, 'Content-type': 'application/json' }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          this.setState({
+            questionData: data,
+          })
+        }
+      })
+      .catch((error) => {
+
+      });
   }
 
-  handleAnswerSelection(selectedAnswer) {
+  async handleAnswerSelection(selectedAnswer) {
     if (selectedAnswer.isCorrectAnswer === true) {
-      this.setState({
-        isCorrectAnswer: true,
-        invalidAnswer: false,
-      });
-      this.loadQuestion();
-    } else {
-      this.setState({
-        invalidAnswer: true,
-      });
-    }
-  }
-
-  //async getUserData() {
-  //  const token = await authService.getAccessToken();
-  //  const user = await authService.getUser();
-  //  this.setState({
-  //    user: user,
-  //    token: token
-  //  });
-  //}
-
-  //async loadQuestion() {
-  loadQuestion() {
-    //await this.getUserData();
-    if (this.state.index === this.state.questionData.length - 1) {
-      this.setState(previousState => ({
-        quizComplete: true,
+      await this.setState(previousState => ({
         score: previousState.score + 1
-      }))
-      //this.submitScore()
+      }));
+    }
+
+    this.loadQuestion();
+  }
+
+  loadQuestion() {
+    if (this.state.index === this.state.questionData.length - 1) {
+      this.submitScore();
     } else {
       this.setState(previousState => ({
-        index: previousState.index + 1,
-        score: previousState.score + 1,
-        isCorrectAnswer: false,
-        invalidAnswer: false
+        index: previousState.index + 1
       }))
     }
   }
 
-  submitScore() {
-    console.log(this.state.score)
-    console.log(this.state.user.sub)
-    let score = this.state.score
-    let userId = this.state.user.sub
+  async submitScore() {
+    let { score, user } = this.state
+    let userId = user.sub
     let scoreData = { score, userId }
 
-    fetch('highscore', {
+    await fetch('highscore', {
       method: 'POST',
       headers: !this.state.token ?
         {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
       body: JSON.stringify(scoreData)
     })
-    //.then(response => response.JSON())
-    this.renderScore()
+
+    this.setState({
+      quizComplete: true
+    })
   }
 
   renderScore() {
+    let message = null
+    this.state.score < 1 ?
+      message = `Better luck next time! Score: ${this.state.score}` :
+      message = `Well done! You scored a total of ${this.state.score}!`
     return (
       <div>
-        <p>Well done! You scored a total of {this.state.score}!</p>
+        <h1>{message}</h1>
         <ScoreBoard
           user={this.state.user}
           score={this.state.score}
@@ -113,25 +115,25 @@ class Quiz extends Component {
   }
 
   render() {
+    let content = null;
     let index = this.state.index
     let data = this.state.questionData[index]
 
-    let content = this.state.quizComplete ?
-      this.submitScore() : <Question
-        question={data}
-        handler={this.handleAnswerSelection}
-      />
+    if (!this.state.questionData.length > 0) {
+      this.fetchQuizData();
+    } else {
+      content = this.state.quizComplete ?
+        this.renderScore() : <Question
+          question={data}
+          handler={this.handleAnswerSelection}
+        />
+    }
 
     let allowedOrNot = this.state.isAuthenticated ? content : this.renderForbidden();
 
-    let answerStatus = this.state.invalidAnswer ?
-      <h1>Damn son, wrong answer...</h1> : null
-
-    //{content}
     return (
       <div>
         {allowedOrNot}
-        {answerStatus}
       </div>
     )
   }

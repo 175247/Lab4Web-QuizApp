@@ -17,6 +17,7 @@ using System.Security.Claims;
 namespace Lab4Web_QuizApp.Controllers
 {
     //[Authorize(Roles ="Administrator")]
+    [Authorize]
     [Route("highscore")]
     [ApiController]
     public class HighScoresController : ControllerBase
@@ -48,10 +49,10 @@ namespace Lab4Web_QuizApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HighScore>>> GetHighScore()
         {
-            if (CheckUserRole().Result == false)
-            {
-                return Unauthorized();
-            }
+            //if (CheckUserRole().Result == false)
+            //{
+            //    return Unauthorized();
+            //}
 
             try
             {

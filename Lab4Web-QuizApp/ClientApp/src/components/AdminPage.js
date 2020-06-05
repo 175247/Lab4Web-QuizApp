@@ -103,25 +103,34 @@ class AdminPage extends Component {
     if (this.state.user === null) {
       return(<></>)
     }
-    this.checkUserRole();
   }
 
   async checkUserRole() {
     await this.getUserData();
     const { token, user } = this.state;
 
+    if (user == null) {
+      return(
+        <p>Login to continue.</p>
+      )
+    }
+
     if (user != null) {
       await fetch('database', {
-        method: 'POST',
+        method: 'GET',
         headers: !token ?
           {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
         //body: JSON.stringify(user.sub)
       })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
+          if (data.success === true) {
             this.setState({
               isUserAnAdmin: true
+            })
+          } else {
+            this.setState({
+              isUserAnAdmin: false
             })
           }
         })
@@ -326,11 +335,11 @@ class AdminPage extends Component {
     this.checkUserRole();
   }
 
-  renderForbidden() {
-    return (
-      <p>Please login to proceed.</p>
-    )
-  }
+  //renderForbidden() {
+  //  return (
+  //    <p>Please login to proceed.</p>
+  //  )
+  //}
   
   render() {
     let adminCheck = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderForbidden()

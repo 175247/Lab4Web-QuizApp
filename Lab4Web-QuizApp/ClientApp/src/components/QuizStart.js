@@ -117,12 +117,7 @@ class QuizStart extends Component {
         }
         return (
             <div>
-                <Quiz
-                    questions={this.state.questionData}
-                    handler={this.genericHandler}
-                    user={this.state.user}
-                    token={this.state.token}
-                />
+                <Quiz />
             </div>
         )
     }
