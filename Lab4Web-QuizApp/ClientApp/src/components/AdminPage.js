@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import InlineError from "./InlineError";
 import authService from './api-authorization/AuthorizeService'
 import DeleteQuestion from './DeleteQuestion'
+import QuestionForm from './QuestionForm'
 
 class AdminPage extends Component {
   constructor(props) {
@@ -27,32 +28,9 @@ class AdminPage extends Component {
       user: {},
       chosenQuestion: {},
     };
-    this.onChangeHandler = this.onChangeHandler.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
     this.fetchQuizData = this.fetchQuizData.bind(this);
     this.resetPage = this.resetPage.bind(this);
   }
-
-  onChangeHandler(event) {
-    const { name, value } = event.target;
-    this.setState({
-      data: { ...this.state.data, [name]: value },
-    });
-  }
-
-  onSubmit = () => {
-    const errors = this.validate(this.state.data);
-    this.setState({ errors });
-    if (Object.keys(errors).length === 0) {
-      if (this.state.renderOption === "newQuestion") {
-        this.props.submitNewQuestion(this.state.data);
-      }
-      else{
-        this.props.submitQuestionChanges(this.state.data, this.state.chosenQuestion);
-      }
-      this.resetPage();
-    }
-  };
 
   async resetPage ()  {
     this.setState({
@@ -61,17 +39,6 @@ class AdminPage extends Component {
       errors: {}
     })
     await this.fetchQuizData();
-  };
-
-  validate = (data) => {
-    const errors = {};
-    if (!data.question) errors.question = "You need to enter the question";
-    if (!data.answer1) errors.answer1 = "Answer nr 1 required";
-    if (!data.answer2) errors.answer2 = "Answer nr 2 required";
-    if (!data.answer3) errors.answer3 = "Answer nr 3 required";
-    if (!data.correctAnswer)
-      errors.correctAnswer = "You need to pick which answer is the correct one";
-    return errors;
   };
 
   stateHandler = (option, questionData) => {
@@ -134,7 +101,6 @@ class AdminPage extends Component {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data)
           this.setState({
             questionData: data,
             isDatabaseSeeded: true,
@@ -274,7 +240,7 @@ class AdminPage extends Component {
         let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
         return <DeleteQuestion question={question} resetPage={this.resetPage}/>
       default:
-        return (this.renderQuestionForm())
+        return <QuestionForm state={this.state} resetPage={this.resetPage}/>
     }
   }
 
