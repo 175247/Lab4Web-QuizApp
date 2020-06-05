@@ -98,15 +98,15 @@ class QuizStart extends Component {
         //    console.log(error)
         //});
         // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
-        //await fetch('database', {
-        //    method: 'POST',
-        //    headers: !token ?
-        //        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-        //})
-        //    .then(response => response.json())
-        //    .then(data => {
-        //        console.log(data)
-        //    })
+        await fetch('database', {
+            method: 'POST',
+            headers: !token ?
+                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            })
 
         this.fetchQuizData()
     }

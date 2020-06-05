@@ -139,8 +139,8 @@ class AdminPage extends Component {
   }
 
   async fetchQuizData() {
-    try
-    {
+    //try
+    //{
       await fetch('questions', {
         method: 'GET',
         headers: !this.state.token ?
@@ -150,15 +150,16 @@ class AdminPage extends Component {
         .then(data => {
           this.setState({
             questionData: data,
-            isDatabaseSeeded: true,
+            isDatabaseSeeded: true
           })
         });
-    }
-    catch{
-      alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
-      this.seedDatabase()
-    }
+    //}
+    //catch{
+    //  alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
+    //  this.seedDatabase()
+    //}
   }
+  
   async seedDatabase() {
     const token = await authService.getAccessToken();
     await fetch('database', {
@@ -347,7 +348,7 @@ class AdminPage extends Component {
 
     return (
       <div>
-        {allowedOrNot}
+        {adminCheck}
       </div>
     );
   }

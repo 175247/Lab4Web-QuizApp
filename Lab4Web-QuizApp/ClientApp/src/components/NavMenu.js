@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
 import authService from './api-authorization/AuthorizeService'
+import AdminPage from "./AdminPage";
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -49,14 +50,13 @@ export class NavMenu extends Component {
 
     if (user != null) {
       await fetch('database', {
-        method: 'POST',
+        method: 'GET',
         headers: !token ?
           {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(user.sub)
       })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
+          if (data.success === true) {
             this.setState({
               isUserAnAdmin: true
             })
@@ -170,6 +170,17 @@ export class NavMenu extends Component {
 
     //let isLoggedInCheck = isAuthenticated ? this.checkUserRole() : this.renderNavbarNormal()
     let content = isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
+
+    // Kolla först om man är inloggad
+    //   Är man inte det, rendera LimitedNavbar
+    //   Är man inloggad, kolla om man är admin
+    //   Är man admin, rendera admin navbar, annars normalnavbar
+
+    //   if (isAuthenticated){
+    //     this.checkUserRole
+    //   } else {
+    //     this.renderLimitedNavbar()
+    //   }
 
     return (
       <div>

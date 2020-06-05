@@ -56,8 +56,12 @@ namespace Lab4Web_QuizApp.Controllers
 
             try
             {
-                var highScore = await _context.HighScores.Include(u => u.User).ToListAsync();
-            
+                //var highScore = await _context.HighScores.Include(u => u.User).ToListAsync();
+                var highScore = await _context.HighScores
+                    .OrderByDescending(s => s.Score)
+                    .ThenByDescending(d => d.DateSubmitted)
+                    .ToListAsync();
+
                 if (highScore.Count() == 0)
                 {
                     return NotFound(new
@@ -116,7 +120,7 @@ namespace Lab4Web_QuizApp.Controllers
                     var highScore = new HighScore
                     {
                         Score = request.Score,
-                        DateSubmitted = DateTime.Now.ToString("dddd, dd MMMM yyyy"),
+                        DateSubmitted = DateTime.Now,
                         Username = currentUser.Email,
                         User = currentUser
                     };

@@ -36,7 +36,8 @@ namespace Lab4Web_QuizApp.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckUserRole()
         {
-            if (User.Identity == null)
+            //if (User.Identity == null)
+            if (User == null)
             {
                 return BadRequest();
             }
