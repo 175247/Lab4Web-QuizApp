@@ -196,8 +196,8 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("DateSubmitted")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("DateSubmitted")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Score")
                         .HasColumnType("int");
@@ -259,8 +259,8 @@ namespace Lab4Web_QuizApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5effe2e4-6f0d-4b18-82e2-9aa119a66dcb",
-                            ConcurrencyStamp = "c3661669-5586-4406-8d86-967136fedfba",
+                            Id = "4517220f-5c01-4117-a646-40ab201d3847",
+                            ConcurrencyStamp = "258f6823-0996-4a05-8f59-592c42cec14b",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -317,10 +317,12 @@ namespace Lab4Web_QuizApp.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -357,10 +359,12 @@ namespace Lab4Web_QuizApp.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
+    //public enum RoleCheckReturnTypes { IsAdmin, IsNotAdmin, BadRequest, Ok, InternalServerError }
     [Authorize(Roles = "Administrator")]
     [Route("administration")]
     [ApiController]
@@ -23,7 +23,7 @@ namespace Lab4Web_QuizApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private RoleCheckReturnTypes roleCheckResult;
+        //private RoleCheckReturnTypes roleCheckResult;
 
         public AdministrationController(ApplicationDbContext context,
             RoleManager<IdentityRole> roleManager,
@@ -33,26 +33,6 @@ namespace Lab4Web_QuizApp.Controllers
             _roleManager = roleManager;
             _userManager = userManager;
         }
-
-        //public bool CheckUserRole(string userId)
-        //{
-        //    if (userId == null)
-        //    {
-        //        roleCheckResult = RoleCheckReturnTypes.BadRequest;
-        //    }
-        //
-        //    var currentUser =  _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        //    var adminRoleUsers =  _userManager.GetUsersInRoleAsync("Administrator");
-        //    List<ApplicationUser> users = adminRoleUsers;
-        //
-        //    foreach (var admins in adminRoleUsers)
-        //    {
-        //        if (admins.Id == currentUser.Id)
-        //            return true;
-        //    }
-        //
-        //    return false;
-        //}
 
         [HttpPost]
         public async Task<IActionResult> CheckUserRole([FromBody] string userId)
@@ -77,23 +57,15 @@ namespace Lab4Web_QuizApp.Controllers
                 return Ok(new
                 {
                     success = true,
-                    message = $"The user {currentUser.Email} is an admin"
                 });
             }
             else
             {
-                return NotFound(new
+                return Unauthorized(new 
                 {
-                    success = false,
-                    message = $"The user {currentUser.Email} is NOT an admin"
+                    success = "false" 
                 });
             }
-
-            //return StatusCode(StatusCodes.Status500InternalServerError, new
-            //{
-            //    success = false,
-            //    description = "The database is currently unavailable"
-            //});
         }
 
        //[HttpGet]

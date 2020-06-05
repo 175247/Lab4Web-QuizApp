@@ -1,5 +1,3 @@
-import React from "react";
-
 export default async function Submit(inputData) {
   const QuestionString = inputData.question;
   const answer1 = { Answerstring: inputData.answer1, IsCorrectAnswer: false };

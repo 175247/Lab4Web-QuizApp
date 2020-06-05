@@ -19,7 +19,8 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Administrator")]
+    [Authorize]
     [Route("questions")]
     [ApiController]
     public class QuestionsController : ControllerBase
@@ -35,7 +36,7 @@ namespace Lab4Web_QuizApp.Controllers
             var response = Enumerable.Range(0, question.Count())
                         .Select(index => new QuestionResponse
                         {
-                            RequestTime = DateTime.Now,
+                            RequestTime = DateTime.Now.ToString("dddd, dd MMMM yyyy"),
                             Id = question[index].Id,
                             QuestionString = question[index].QuestionString,
                             AnswerOptions = question[index].AnswerOptions
@@ -74,7 +75,7 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return BadRequest(exception);
+                    return BadRequest(exception.InnerException);
                 }
             }
             else // Leaving this "else" here for clarity and readability.
@@ -86,13 +87,16 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
-        //[Authorize(Roles="Administrator")]
         [HttpPost]
         public async Task<IActionResult> SubmitNewQuestion([FromBody] QuestionRequest request)
         {
             if (request == null)
             {
-                return BadRequest(new { success = false, message = "Body cannot contain null" });
+                return BadRequest(new 
+                {
+                    success = false, 
+                    message = "Body cannot contain null" 
+                });
             }
 
             var answers = new List<Answer>();
