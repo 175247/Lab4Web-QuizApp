@@ -66,20 +66,22 @@ namespace Lab4Web_QuizApp.Controllers
             }
             catch (Exception exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return BadRequest(new
                 {
                     success = false,
-                    description = exception.InnerException
+                    description = exception.ToString()
                 });
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> SeedAdmin()
         {
             string roleName = "Administrator";
             var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
-        
+            try
+            {
             if (!isRoleExists)
             {
                 await _roleManager.CreateAsync(new IdentityRole(roleName));
@@ -99,21 +101,26 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 await _userManager.AddToRoleAsync(adminUser, roleName);
         
-                return Ok(new
+                return Created("/database/SeedAdmin", new
                 {
                     success = true,
                     description = "Admin user added."
                 });
             }
         
-            return StatusCode(StatusCodes.Status500InternalServerError, new
+            return Conflict(new
             {
                 success = false,
                 description = actionResult.Errors
             });
-        
+            }
+            catch(Exception exception)
+            {
+                return BadRequest(exception.ToString());
+            }
         }
 
+        [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> SeedDatabase()
         {
@@ -169,7 +176,7 @@ namespace Lab4Web_QuizApp.Controllers
             };
             if (questionBank.Count() > 0 && questionBank.Count() <= questions.Count())
             {
-                return Ok(new
+                return Conflict(new
                 {
                     success = true,
                     description = "The database is already seeded."
@@ -182,7 +189,7 @@ namespace Lab4Web_QuizApp.Controllers
                     await _context.Questions.AddRangeAsync(questions);
                     await _context.SaveChangesAsync();
 
-                    return Ok(new
+                    return Created("/database/SeedDatabase", new
                     {
                         success = true,
                         description = "Seed complete"
@@ -190,10 +197,10 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+                    return BadRequest(new
                     {
                         success = false,
-                        description = exception.InnerException
+                        description = exception.ToString()
                     });
                 }
             }

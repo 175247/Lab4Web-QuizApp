@@ -82,7 +82,7 @@ class QuizStart extends Component {
 
     renderQuiz() {
         if (this.state.questionData === null) {
-            this.state.renderButtons()
+            this.renderButtons()
         }
         return (
             <div>
@@ -99,6 +99,7 @@ class QuizStart extends Component {
     }
 
     renderButtons(isDatabaseSeeded) {
+        console.log(isDatabaseSeeded)
         let buttonName = isDatabaseSeeded ? "isWantToPlay" : "seedDatabase"
         let buttonValue = isDatabaseSeeded ? this.state.isWantToPlay : this.state.seedDatabase
         let buttonStyling = isDatabaseSeeded ? "btn btn-success" : "btn btn-danger"
