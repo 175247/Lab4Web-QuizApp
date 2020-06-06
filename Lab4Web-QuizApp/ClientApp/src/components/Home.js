@@ -5,9 +5,9 @@ export class Home extends Component {
 
     render() {
         return (
-            <div>
+            <p>
                 Hai ther and velcom to qiz. klik qis pliz
-            </div>
+            </p>
         );
     }
 }
