@@ -50,28 +50,24 @@ class ScoreBoard extends Component {
 
     renderScores() {
         return (
-            <div className="border p-3 mt-3">
-                <table className="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Score Id:</th>
-                            <th>Submitted:</th>
-                            <th>Score:</th>
-                            <th>Username:</th>
-                        </tr>
-                        {
-                            this.state.highScores.map(entrance => (
-                                <tr key={entrance.id}>
-                                    <td>{entrance.id}</td>
-                                    <td>{entrance.dateSubmitted}</td>
-                                    <td>{entrance.score}</td>
-                                    <td>{entrance.username}</td>
-                                </tr>
-                            ))
-                        }
-                    </thead>
-                </table>
-            </div>
+            <table className="table table-striped" class="score-table">
+                <thead>
+                    <tr>
+                        <th>Submitted:</th>
+                        <th>Score:</th>
+                        <th>Username:</th>
+                    </tr>
+                    {
+                        this.state.highScores.map(entrance => (
+                            <tr key={entrance.id}>
+                                <td>{entrance.dateSubmitted}</td>
+                                <td>{entrance.score}</td>
+                                <td>{entrance.username}</td>
+                            </tr>
+                        ))
+                    }
+                </thead>
+            </table>
         )
     }
 

@@ -12,3 +12,12 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+  .score-table{
+    width: 100%;
+  }
+@media (max-width: 600px) {
+  .score-table{
+    width: 50%;
+  }
+}
