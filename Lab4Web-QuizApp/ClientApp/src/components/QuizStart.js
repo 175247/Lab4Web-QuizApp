@@ -1,12 +1,12 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import authService from './api-authorization/AuthorizeService'
 import Quiz from './Quiz'
+import apiCalls from '../helpers/ajaxCalls'
 
 class QuizStart extends Component {
     constructor() {
         super()
         this.state = {
-            isInitialSetup: false,
             score: 0,
             quizComplete: false,
             isDatabaseSeeded: false,
@@ -16,6 +16,7 @@ class QuizStart extends Component {
             token: {},
             isAuthenticated: false,
             isUserAnAdmin: false,
+            isAdminSeeded: false,
             user: {}
         }
         this.fetchQuizData = this.fetchQuizData.bind(this)
@@ -25,8 +26,6 @@ class QuizStart extends Component {
     }
 
     componentDidMount() {
-        this.fetchQuizData();
-        this.getUserData();
         this.checkUserRole();
     }
 
@@ -38,102 +37,56 @@ class QuizStart extends Component {
             user: user,
             token: token
         });
-        //this.checkUserRole()
-        //if (!user === null) { this.checkUserRole(); }
     }
 
-    //async checkUserRole() {
-    //    const user = this.state.user
-    //    return await fetch("database", {
-    //        method: "POST",
-    //        headers: { "Content-type": "application/json" },
-    //        body: JSON.stringify(user.sub),
-    //    })
-    //        .then((response) => response.json())
-    //        .then((data) => {
-    //            console.log(data);
-    //        })
-    //        .catch((error) => {
-    //            console.log(error);
-    //        });
-    //}
-
     async checkUserRole() {
-        const token = await authService.getAccessToken();
-        const userId = this.state.user.sub
-        await fetch('database', {
-            method: 'POST',
-            headers: !token ?
-                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(userId)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.setState({
-                        isUserAnAdmin: true
-                    })
-                }
-            })
+        await this.getUserData();
+        if (this.state.user != null) {
+            const result = await apiCalls.genericFetch("database", "GET", this.state.token)
+            if (result.success === true) {
+                this.setState({
+                    isUserAnAdmin: true
+                })
+            }
+            this.fetchQuizData();
+        }
     }
 
     async fetchQuizData() {
-        const token = await authService.getAccessToken();
-        await fetch('questions', {
-            method: 'GET',
-            headers: !token ?
-                {} : { 'Authorization': `Bearer ${token}`, 'Content-type': 'application/json' }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    questionData: data,
-                    isDatabaseSeeded: true,
-                    isInitialSetup: true
-                })
-            });
+        const result = await apiCalls.genericFetch("questions", "GET", this.state.token)
+        if (result.length > 0) {
+            this.setState({
+                questionData: result,
+                isDatabaseSeeded: true
+            })
+        }
     }
 
     async seedDatabase() {
-        const token = await authService.getAccessToken();
-        await fetch('database', {
-            method: 'PUT',
-            headers: !token ?
-                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    seedStatus: data.description
-                })
-            })
-        //.catch(error => {
-        //    console.log(error)
-        //});
-        // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
-        //await fetch('database', {
-        //    method: 'POST',
-        //    headers: !token ?
-        //        {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-        //})
-        //    .then(response => response.json())
-        //    .then(data => {
-        //        console.log(data)
-        //    })
+        const { isDatabaseSeeded, isAdminSeeded, token } = this.state
+        if (isDatabaseSeeded === false) {
+            const result = apiCalls.genericFetch("database", "PUT", token)
+            this.setState({ seedStatus: result.description })
+        }
 
+        if (isAdminSeeded === false) {
+            const result = await apiCalls.genericFetch("database", "POST", token)
+            if (result.success === true) {
+                this.setState({ isAdminSeeded: true })
+            } else {
+                console.log(result.description);
+            }
+        }
         this.fetchQuizData()
     }
 
     renderQuiz() {
-        if (this.state.questionData == null) {
-            this.state.renderButtons()
+        if (this.state.questionData === null) {
+            this.renderButtons()
         }
         return (
             <div>
-                <Quiz
-                    questions={this.state.questionData}
-                    handler={this.genericHandler}
-                />
+                <Quiz />
             </div>
         )
     }
@@ -167,13 +120,15 @@ class QuizStart extends Component {
     }
 
     render() {
-        const { isWantToPlay, isDatabaseSeeded, isInitialSetup } = this.state
+        const { isAuthenticated, isWantToPlay, isDatabaseSeeded } = this.state
         let buttons = isWantToPlay ?
             this.renderQuiz() : this.renderButtons(isDatabaseSeeded)
+        let content = isAuthenticated ? buttons : <p>Please login before proceeding.</p>
 
+        //{buttons}
         return (
             <div>
-                {buttons}
+                {content}
             </div>
         )
     }

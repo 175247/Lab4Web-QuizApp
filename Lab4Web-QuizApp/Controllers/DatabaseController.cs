@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Lab4Web_QuizApp.Data;
 using Lab4Web_QuizApp.Models;
@@ -14,7 +15,7 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles ="Administrator")]
+    [Authorize]
     [Route("database")]
     [ApiController]
     public class DatabaseController : ControllerBase
@@ -32,94 +33,104 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CheckUserRole([FromBody] string userId)
+        [HttpGet]
+        public async Task<IActionResult> CheckUserRole()
         {
-            if (userId == null)
+            if (User == null)
             {
-                return BadRequest();
-            }
-        
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var isUserAnAdmin = false;
-            var adminRoleUsers = await _userManager.GetUsersInRoleAsync("Administrator");
-        
-            foreach (var admins in adminRoleUsers)
-            {
-                if (admins.Id == currentUser.Id)
-                    isUserAnAdmin = true;
-            }
-        
-            if (isUserAnAdmin)
-            {
-                return Ok(new
-                {
-                    success = true,
-                    message = $"The user {currentUser.Email} is an admin"
+                return BadRequest(new 
+                { 
+                    success = false, 
+                    message = "RoleCheck failed as User is null, login to proceed." 
                 });
             }
-            else
+        
+            try
             {
-                return NotFound(new
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                var user = _context.Users.Find(claim.Value);
+        
+                var roles = await _userManager.GetRolesAsync(user);
+        
+                if (roles.Contains("Administrator"))
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "RoleCheck approved."
+                    });
+                }
+        
+                return Unauthorized(new
                 {
                     success = false,
-                    message = $"The user {currentUser.Email} is NOT an admin"
+                    message = "RoleCheck denied."
+                });
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    description = exception.ToString()
+                });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> SeedAdmin()
+        {
+            string roleName = "Administrator";
+            var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
+            try
+            {
+            if (!isRoleExists)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        
+            var adminUser = new ApplicationUser
+            {
+                UserName = "admin@admin.com",
+                Email = "admin@admin.com",
+                EmailConfirmed = true
+            };
+            var password = "Admin1½";
+        
+            var actionResult = await _userManager.CreateAsync(adminUser, password);
+        
+            if (actionResult.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(adminUser, roleName);
+        
+                return Created("/database/SeedAdmin", new
+                {
+                    success = true,
+                    description = "Admin user added."
                 });
             }
         
-            return StatusCode(StatusCodes.Status500InternalServerError, new
+            return Conflict(new
             {
                 success = false,
-                description = "The database is currently unavailable"
+                description = actionResult.Errors
             });
+            }
+            catch(Exception exception)
+            {
+                return BadRequest(exception.ToString());
+            }
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> SeedAdmin()
-        //{
-        //    string roleName = "Administrator";
-        //    var isRoleExists = await _roleManager.RoleExistsAsync(roleName);
-        //
-        //    if (!isRoleExists)
-        //    {
-        //        await _roleManager.CreateAsync(new IdentityRole(roleName));
-        //    }
-        //
-        //    var adminUser = new ApplicationUser
-        //    {
-        //        UserName = "admin@admin.com",
-        //        Email = "admin@admin.com",
-        //        EmailConfirmed = true
-        //    };
-        //    var password = "Admin1½";
-        //
-        //    var actionResult = await _userManager.CreateAsync(adminUser, password);
-        //
-        //    if (actionResult.Succeeded)
-        //    {
-        //        await _userManager.AddToRoleAsync(adminUser, roleName);
-        //
-        //        return Ok(new
-        //        {
-        //            success = true,
-        //            description = "Admin user added."
-        //        });
-        //    }
-        //
-        //    return StatusCode(StatusCodes.Status500InternalServerError, new
-        //    {
-        //        success = false,
-        //        description = actionResult.Errors
-        //    });
-        //
-        //}
-
+        [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> SeedDatabase()
         {
             await _context.Database.MigrateAsync();
             var questionBank = await _context.Questions.Include(a => a.AnswerOptions).ToListAsync();
-        
+
             var questions = new List<Question>
             {
                 new Question
@@ -169,7 +180,7 @@ namespace Lab4Web_QuizApp.Controllers
             };
             if (questionBank.Count() > 0 && questionBank.Count() <= questions.Count())
             {
-                return Ok(new
+                return Conflict(new
                 {
                     success = true,
                     description = "The database is already seeded."
@@ -179,22 +190,10 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 try
                 {
-                    //var currentUser = await _userManager.GetUserAsync(User);
-                    //
-                    //var highScoreDummy = new HighScore
-                    //{
-                    //    DateSubmitted = DateTime.Now,
-                    //    Score = 3,
-                    //    User = currentUser,
-                    //    Username = currentUser.Email
-                    //};
-
-
                     await _context.Questions.AddRangeAsync(questions);
-                    //await _context.HighScores.AddAsync(highScoreDummy);
                     await _context.SaveChangesAsync();
 
-                    return Ok(new
+                    return Created("/database/SeedDatabase", new
                     {
                         success = true,
                         description = "Seed complete"
@@ -202,11 +201,10 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new
+                    return BadRequest(new
                     {
                         success = false,
-                        message = "The database is currently unavailable.",
-                        description = exception.InnerException
+                        description = exception.ToString()
                     });
                 }
             }

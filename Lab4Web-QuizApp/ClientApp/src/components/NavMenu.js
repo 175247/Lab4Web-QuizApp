@@ -11,25 +11,49 @@ import {
 import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
+import authService from './api-authorization/AuthorizeService'
+import apiCalls from '../helpers/ajaxCalls'
+
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
-
   constructor(props) {
     super(props);
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       collapsed: true,
-      //    accessToken: [],
-      //    isUserAuthenticated: false,
-      //    currentUser: {}
+      isAuthenticated: false,
+      token: {},
+      user: {},
+      isUserAnAdmin: false
     };
   }
 
-  componentDidMount() {
-    //   this.getUserData();
+  async componentDidMount() {
+    await this.checkUserRole();
+  }
 
+  async getUserData() {
+    const token = await authService.getAccessToken();
+    const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+    this.setState({
+      isAuthenticated: isAuthenticated,
+      user: user,
+      token: token
+    });
+  }
+
+  async checkUserRole() {
+    await this.getUserData();
+    if (this.state.user != null) {
+      const result = await apiCalls.genericFetch("database", "GET", this.state.token)
+      if (result.success === true) {
+        this.setState({
+          isUserAnAdmin: true
+        })
+      }
+    }
   }
 
   toggleNavbar() {
@@ -37,34 +61,6 @@ export class NavMenu extends Component {
       collapsed: !this.state.collapsed,
     });
   }
-
-  //async getUserData() {
-  //  const token = await authService.getAccessToken();
-  //  const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
-  //  this.setState({
-  //    isUserAuthenticated: isAuthenticated,
-  //    currentUser: user,
-  //    accessToken: token
-  //  });
-  //  this.checkUserRole();
-  //}
-
-  //async checkUserRole() {
-  //  await fetch('database', {
-  //    method: 'POST',
-  //    headers: !this.state.token ?
-  //      {} : { "Content-type": "application/json", 'Authorization': `Bearer ${this.state.token}` },
-  //    body: JSON.stringify(this.state.user)
-  //  })
-  //    .then(response => response.json())
-  //    .then(data => {
-  //      if (data.success) {
-  //        this.setState({
-  //          isUserAnAdmin: true
-  //        })
-  //      }
-  //    })
-  //}
 
   renderNavbarNormal() {
     return (
@@ -85,17 +81,17 @@ export class NavMenu extends Component {
             >
               <ul className="navbar-nav flex-grow">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">
+                  <NavLink tag={Link} className="basicNavlink" to="/">
                     Home
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                  <NavLink tag={Link} className="basicNavlink" to="/quiz-start">
                     Quiz
                   </NavLink>
                 </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                <NavItem className="basicNavlink">
+                  <NavLink tag={Link} className="basicNavlink" to="/scoreboard">
                     Scoreboard
                   </NavLink>
                 </NavItem>
@@ -116,8 +112,8 @@ export class NavMenu extends Component {
           light
         >
           <Container>
-            <NavbarBrand tag={Link} to="/">
-              Lab4Web_QuizApp
+            <NavbarBrand className="basicNavlink" tag={Link} to="/">
+              Quiz!
           </NavbarBrand>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse
@@ -125,32 +121,32 @@ export class NavMenu extends Component {
               isOpen={!this.state.collapsed}
               navbar
             >
-              <ul className="navbar-nav flex-grow">
+              <ul className="flex-grow basicNavlink navbar-nav">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">
+                  <NavLink tag={Link} className="basicNavlink" to="/">
                     Home
                 </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                  <NavLink tag={Link} className="basicNavlink" to="/quiz-start">
                     Quiz
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                  <NavLink tag={Link} className="basicNavlink" to="/scoreboard">
                     Scoreboard
                   </NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink
                     tag={Link}
-                    className="text-dark"
+                    className="basicNavlink"
                     to="/admin-page"
                   >
                     AdminPage
                 </NavLink>
                 </NavItem>
-                <LoginMenu></LoginMenu>
+                <LoginMenu className="basicNavlink"></LoginMenu>
               </ul>
             </Collapse>
           </Container>
@@ -161,11 +157,27 @@ export class NavMenu extends Component {
 
 
   render() {
-    //let adminStuff = this.state.isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
-    let adminStuff = this.renderNavbarAdmin();
+    //const { isAuthenticated, isUserAnAdmin } = this.state
+    const { isUserAnAdmin } = this.state
+
+
+    //let isLoggedInCheck = isAuthenticated ? this.checkUserRole() : this.renderNavbarNormal()
+    let content = isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
+
+    // Kolla först om man är inloggad
+    //   Är man inte det, rendera LimitedNavbar
+    //   Är man inloggad, kolla om man är admin
+    //   Är man admin, rendera admin navbar, annars normalnavbar
+
+    //   if (isAuthenticated){
+    //     this.checkUserRole
+    //   } else {
+    //     this.renderLimitedNavbar()
+    //   }
+
     return (
       <div>
-        {adminStuff}
+        {content}
       </div>
     );
   }

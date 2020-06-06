@@ -1,3 +1,6 @@
+import authService from './api-authorization/AuthorizeService'
+
+
 export default async function SubmitNewQuestion(inputData) {
   const QuestionString = inputData.question;
   const answer1 = { Answerstring: inputData.answer1, IsCorrectAnswer: false };
@@ -24,14 +27,15 @@ export default async function SubmitNewQuestion(inputData) {
     QuestionString: QuestionString,
     AnswerOptions: [answer1, answer2, answer3],
   };
+  const token = await authService.getAccessToken();
   return await fetch("questions", {
     method: "POST",
-    headers: { "Content-type": "application/json" },
+    headers: !token ?
+      {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(request),
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
     })
     .catch((error) => {
       console.log(error);

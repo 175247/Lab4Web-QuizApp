@@ -1,43 +1,76 @@
 import React, { Component } from 'react'
+import authService from './api-authorization/AuthorizeService'
 
 class ScoreBoard extends Component {
     constructor(props) {
         super(props)
         this.state = {
             highScores: [],
-            isScoreExists: false
+            isScoreExists: false,
+            token: {},
+            user: {},
+            isAuthenticated: false
         }
     }
 
+    async getUserData() {
+        const token = await authService.getAccessToken();
+        const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
+        this.setState({
+            isAuthenticated: isAuthenticated,
+            user: user,
+            token: token
+        });
+        isAuthenticated ? this.fetchScore() : this.renderForbidden()
+    }
+
+    componentDidMount() {
+        this.getUserData();
+    }
+
     async fetchScore() {
-        await fetch('highscore')
+        await fetch('highscore', {
+            method: 'GET',
+            headers: !this.state.token ?
+                {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
+        })
             .then(response => response.json())
             .then(data => {
-                this.setState({
-                    highScores: data,
-                    isScoreExists: true
-                })
+                if (data.length > 0) {
+                    this.setState({
+                        highScores: data,
+                        isScoreExists: true
+                    })
+                }
             })
+            .catch(error => {
+            })
+    }
+    formatString(time) {
+        let date = new Date(time).toLocaleString();
+        return date
     }
 
     renderScores() {
         return (
-            <div className="border p-3 mt-3">
-                <table className="table table-striped">
+            <div>
+                <h2>Displaying the latest top scores (fetched {this.state.highScores.length}):</h2>
+                <table className="table table-dark">
                     <thead>
                         <tr>
-                            <th>Score Id:</th>
-                            <th>Submitted:</th>
-                            <th>Score:</th>
                             <th>Username:</th>
+                            <th>Score:</th>
+                            <th>Submitted:</th>
                         </tr>
-                        {this.state.highScores.map(entrance =>
-                            <tr key={entrance.Id}>
-                                <td>{entrance.DateSubmitted}</td>
-                                <td>{entrance.Score}</td>
-                                <td>{entrance.User}</td>
-                            </tr>
-                        )}
+                        {
+                            this.state.highScores.map(entrance => (
+                                <tr key={entrance.id}>
+                                    <td>{entrance.username}</td>
+                                    <td>{entrance.score}</td>
+                                    <td>{this.formatString(entrance.dateSubmitted)}</td>
+                                </tr>
+                            ))
+                        }
                     </thead>
                 </table>
             </div>
@@ -52,11 +85,23 @@ class ScoreBoard extends Component {
         )
     }
 
+    renderForbidden() {
+        return (
+            <div>
+                <p>Please log in to continue.</p>
+            </div>
+        )
+    }
+
     render() {
         let content = this.state.isScoreExists ?
             this.renderScores() : this.renderNoScore()
+        let allowedOrNot = this.state.isAuthenticated ? content : this.renderForbidden();
+
         return (
-            content
+            <div>
+                {allowedOrNot}
+            </div>
         )
     }
 }

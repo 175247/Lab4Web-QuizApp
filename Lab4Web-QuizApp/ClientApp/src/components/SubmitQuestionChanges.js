@@ -1,3 +1,5 @@
+import authService from './api-authorization/AuthorizeService'
+
 export default async function SubmitQuestionChanges(inputData, question) {
     const answerOptions = question.answerOptions;
     const answer1 = {
@@ -40,9 +42,11 @@ export default async function SubmitQuestionChanges(inputData, question) {
         QuestionString: inputData.question,
         AnswerOptions: [answer1, answer2, answer3],
     };
+    const token = await authService.getAccessToken();
     return await fetch("questions/" + question.id, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: !token ?
+            {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(request),
     });
 }
