@@ -53,7 +53,7 @@ class QuizStart extends Component {
     }
 
     async fetchQuizData() {
-        const result = await Promise.resolve(apiCalls.genericFetch("questions", "GET", this.state.token))
+        const result = await apiCalls.genericFetch("questions", "GET", this.state.token)
         if (result.length > 0) {
             this.setState({
                 questionData: result,
@@ -65,12 +65,12 @@ class QuizStart extends Component {
     async seedDatabase() {
         const { isDatabaseSeeded, isAdminSeeded, token } = this.state
         if (isDatabaseSeeded === false) {
-            const result = await Promise.resolve(apiCalls.genericFetch("database", "PUT", token))
+            const result = apiCalls.genericFetch("database", "PUT", token)
             this.setState({ seedStatus: result.description })
         }
 
         if (isAdminSeeded === false) {
-            const result = await Promise.resolve(apiCalls.genericFetch("database", "POST", token))
+            const result = await apiCalls.genericFetch("database", "POST", token)
             if (result.success === true) {
                 this.setState({ isAdminSeeded: true })
             } else {

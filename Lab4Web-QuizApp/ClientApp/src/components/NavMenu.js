@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
 import authService from './api-authorization/AuthorizeService'
-//import AdminPage from "./AdminPage";
+import apiCalls from '../helpers/ajaxCalls'
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -46,22 +46,13 @@ export class NavMenu extends Component {
 
   async checkUserRole() {
     await this.getUserData();
-    const { token, user } = this.state;
-
-    if (user != null) {
-      await fetch('database', {
-        method: 'GET',
-        headers: !token ?
-          {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success === true) {
-            this.setState({
-              isUserAnAdmin: true
-            })
-          }
+    if (this.state.user != null) {
+      const result = await apiCalls.genericFetch("database", "GET", this.state.token)
+      if (result.success === true) {
+        this.setState({
+          isUserAnAdmin: true
         })
+      }
     }
   }
 

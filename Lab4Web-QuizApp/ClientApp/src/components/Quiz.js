@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import Question from "./Question"
 import ScoreBoard from './ScoreBoard'
 import authService from './api-authorization/AuthorizeService'
+import apiCalls from '../helpers/ajaxCalls'
 
 class Quiz extends Component {
   constructor(props) {
@@ -36,23 +37,12 @@ class Quiz extends Component {
   }
 
   async fetchQuizData() {
-    const token = await authService.getAccessToken();
-    await fetch('questions', {
-      method: 'GET',
-      headers: !token ?
-        {} : { 'Authorization': `Bearer ${token}`, 'Content-type': 'application/json' }
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.length > 0) {
-          this.setState({
-            questionData: data,
-          })
-        }
+    const result = await apiCalls.genericFetch("questions", "GET", this.state.token)
+    if (result.length > 0) {
+      this.setState({
+        questionData: result
       })
-      .catch((error) => {
-
-      });
+    }
   }
 
   async handleAnswerSelection(selectedAnswer) {
@@ -86,7 +76,6 @@ class Quiz extends Component {
         {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
       body: JSON.stringify(scoreData)
     })
-
     this.setState({
       quizComplete: true
     })

@@ -54,13 +54,15 @@ namespace Lab4Web_QuizApp.Controllers
                 {
                     return Ok(new
                     {
-                        success = true
+                        success = true,
+                        message = "RoleCheck approved."
                     });
                 }
         
                 return Unauthorized(new
                 {
-                    success = "false"
+                    success = false,
+                    message = "RoleCheck denied."
                 });
             }
             catch (Exception exception)
