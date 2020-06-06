@@ -171,7 +171,7 @@ class Quiz extends Component {
       this.fetchQuizData();
     }
     else {
-      if (this.state.isCorrectAnswer) {
+      if (this.state.isCorrectAnswer || this.state.invalidAnswerSelected) {
         content = null
       }
       else {

@@ -38,6 +38,7 @@ namespace Lab4Web_QuizApp.Controllers
                 var highScore = await _context.HighScores
                     .OrderByDescending(s => s.Score)
                     .ThenByDescending(d => d.DateSubmitted)
+                    .Take(10)
                     .ToListAsync();
 
                 if (highScore.Count() == 0)
