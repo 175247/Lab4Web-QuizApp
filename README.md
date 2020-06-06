@@ -45,16 +45,16 @@ Receive the model, check for null and then map the request DTO to the databsemod
 
 (done) 12. -> Create the admin role.
 
-12.1 -> Restrict adding questions to only allow users with the admin role to do it.
+(done) 12.1 -> Restrict adding questions to only allow users with the admin role to do it.
 
-13. -> Add HighScore component in front end and model + return in controller/backend.
+(done) 13. -> Add HighScore component in front end and model + return in controller/backend.
 14. -> Check the G and VG criterias.
 
-15. -> Make sure it's all responsive.
+(done) 15. -> Make sure it's all responsive.
 
-16. -> Clean and shave excessive code.
+(done) 16. -> Clean and shave excessive code.
 
-17. -> Add some CSS animations and proceed re-iterate this list.
+(done) 17. -> Add some CSS animations and proceed re-iterate this list.
 
 https://www.pluralsight.com/guides/how-to-use-radio-buttons-in-reactjs
 
@@ -65,3 +65,23 @@ https://www.c-sharpcorner.com/article/how-to-use-dropdown-and-radio-buttons-in-r
 https://stackoverflow.com/questions/42701129/how-to-push-to-history-in-react-router-v4
 
 https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+(done) G appen ska vara ett WebApi projekt, SPA med React
+(done) G menyalternativ för quiz, high score, registrering + inloggning
+(done) G quiz-läge (se rubriken Quiz)
+(done) G high score
+(done) G registrera och logga in användare för att kunna se React-appen
+(done) G backend-appen följer till 50% API design guidance (REST Api standarden)
+(done) VG appen sparar olika användares poäng
+(done) VG lägga till, redigera och ta bort frågor; om man är inloggad som admin
+(done) VG appen har en annan stildesign än det som kommer med ramverken
+(done) VG appen är responsiv (testas med samtliga devices som finns i device emulatorn i chrome)
+(done) VG backend-appen följer till 80% API design guidance (REST Api standarden)
+(done) VG Lämna in innan deadline
+(done) VG Påvisa en god förmåga att kunna hitta en balans mellan att:
+Undvika överflödig kod så som i redundant kod, dubbletter och stycken som kan ersättas med loopar eller uttryck med mera
+Kommentera eller namnge komplicerade uttryck och stycken
+Undvika komplicerade uttryck och stycken i fördel för fler rader kod med bättre läsvänlighet
+VG Väl namngivna identifiers så att syftet av användandet blir uppenbart
+VG Till den mån det är möjligt alltid använda passande datatyper till värden
+VG Uniform indentering och kodstil. Se "Coding convention"
