@@ -22,27 +22,15 @@ class AdminPage extends Component {
       errors: {},
       questionData: [],
       isDatabaseSeeded: false,
-      renderOption: "list",
       token: {},
       isAuthenticated: false,
       isUserAnAdmin: false,
       user: {},
-      chosenQuestion: {},
       renderMethod: [],
     };
     this.fetchQuizData = this.fetchQuizData.bind(this);
     this.stateHandler = this.stateHandler.bind(this);
   }
-
-  //async resetPage ()  {
-  //  this.setState({
-  //    renderOption: "list",
-  //    data: "",
-  //    errors: {},
-  //    renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
-  //  })
-  //  await this.fetchQuizData();
-  //};
 
   async stateHandler(option, questionData) {
     if(questionData){
@@ -54,9 +42,6 @@ class AdminPage extends Component {
       data.answer3 = questionData.answerOptions[2].answerString;
       return { data };
     })}
-    this.setState({
-      chosenQuestion: questionData,
-    })
     if (option === "delete") {
       this.setState({
         renderMethod:<DeleteQuestion question={questionData} stateHandler={this.stateHandler}/>
@@ -142,21 +127,6 @@ class AdminPage extends Component {
     this.fetchQuizData()
 }
 
-  async renderAdmin() {
-    switch (this.state.renderOption) {
-      case "list":
-        return<ol>
-            <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion", null)} >New question</button>
-            <QuestionList state={this.state} stateHandler={this.stateHandler} />
-        </ol>
-      case "delete":
-        let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
-        return <DeleteQuestion question={question} resetPage={this.resetPage}/>
-      default:
-        return <QuestionForm state={this.state} resetPage={this.resetPage}/>
-    }
-  }
-
   renderNormalUser() {
     return (
         <p>You don't have access to this page</p>
@@ -169,9 +139,9 @@ class AdminPage extends Component {
   }
 
   render() {
-    let adminCheckResult = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderNormalUser()
     let contents = this.state.loading
-      ? <p><em>Loading...</em></p>: this.state.renderMethod
+      ? <p><em>Loading...</em></p>: adminCheckResult
     return (
       <div>
         {contents}
