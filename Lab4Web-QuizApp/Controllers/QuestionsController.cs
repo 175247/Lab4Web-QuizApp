@@ -19,7 +19,6 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles = "Administrator")]
     [Authorize]
     [Route("questions")]
     [ApiController]
@@ -61,16 +60,6 @@ namespace Lab4Web_QuizApp.Controllers
                     }
 
                     var response = GenerateQuestionResponse(questions);
-                    //var response = Enumerable.Range(0, questions.Count())
-                    //    .Select(index => new QuestionResponse
-                    //    {
-                    //        RequestTime = DateTime.Now,
-                    //        Id = questions[index].Id,
-                    //        QuestionString = questions[index].QuestionString,
-                    //        AnswerOptions = questions[index].AnswerOptions
-                    //    })
-                    //.ToArray();
-
                     return Ok(response);
                 }
                 catch (Exception exception)

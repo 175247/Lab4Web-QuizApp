@@ -16,7 +16,6 @@ using System.Security.Claims;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles ="Administrator")]
     [Authorize]
     [Route("highscore")]
     [ApiController]
@@ -31,29 +30,10 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
-        private async Task<bool> CheckUserRole()
-        {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var user = _context.Users.Find(claim.Value);
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            if (roles.Contains("Administrator"))
-                return true;
-
-            return false;
-        }
-
         // GET: api/HighScores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HighScore>>> GetHighScore()
         {
-            //if (CheckUserRole().Result == false)
-            //{
-            //    return Unauthorized();
-            //}
-
             try
             {
                 //var highScore = await _context.HighScores.Include(u => u.User).ToListAsync();
