@@ -69,12 +69,34 @@ export class Home extends Component {
         await this.fetchQuizData()
     }
 
+    renderInstructions() {
+        return (
+            <div>
+                <h2>Hej Pontus!</h2>
+                <ol>
+                    <li>Starta appen som du nu gjort, och den kommer att försöka skapa databasen och seeda den automatiskt.
+                        Gör den inte detta så får du registrera dig och navigera till Home.</li>
+                    <li>Admin login:</li>
+                    <ul>
+                        <li>
+                            Username: admin@admin.com
+                        </li>
+                        <li>
+                            Password: Admin1½
+                        </li>
+                    </ul>
+                    <li>Är det fortfarande inte seedat så gå till Quiz och tryck på knappen.</li>
+                </ol>
+            </div>
+        )
+    }
 
     render() {
+        const content = this.renderInstructions()
         return (
-            <p>
-                Hai ther and velcom to qiz. klik qis pliz
-            </p>
+            <div>
+                {content}
+            </div>
         );
     }
 }
