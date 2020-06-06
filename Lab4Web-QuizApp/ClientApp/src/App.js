@@ -28,7 +28,7 @@ export default class App extends Component {
         <AuthorizeRoute path="/quiz" component={Quiz} />
         <AuthorizeRoute path="/scoreboard" component={ScoreBoard} />
         <AuthorizeRoute path="/quiz-start" component={QuizStart} />
-        <AuthorizeRoute
+        <Route
           path="/admin-page"
           render={(props) => <AdminPage {...props} submitNewQuestion={SubmitNewQuestion} submitQuestionChanges={SubmitQuestionChanges} />}
         />
