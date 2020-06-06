@@ -23,7 +23,6 @@ class AdminPage extends Component {
       questionData: [],
       isDatabaseSeeded: false,
       token: {},
-      isAuthenticated: false,
       isUserAnAdmin: false,
       user: {},
       renderMethod: [],
@@ -151,17 +150,11 @@ class AdminPage extends Component {
     await this.fetchQuizData();
   }
 
-  //renderForbidden() {
-  //  return (
-  //    <p>Please login to proceed.</p>
-  //  )
-  //}
   
   render() {
     let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderNormalUser()
     let contents = this.state.loading
       ? <p><em>Loading...</em></p>: adminCheckResult
-    let allowedOrNot = this.state.isAuthenticated ? adminCheck : this.renderForbidden()
 
     return (
       <div>
