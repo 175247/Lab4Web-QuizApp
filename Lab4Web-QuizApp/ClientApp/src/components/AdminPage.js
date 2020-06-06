@@ -82,6 +82,7 @@ class AdminPage extends Component {
 
   async fetchQuizData() {
     const result = await apiCalls.genericFetch("questions", "GET", this.state.token)
+   
     if (result.length > 0) {
         this.setState({
             questionData: result,
@@ -91,16 +92,11 @@ class AdminPage extends Component {
             renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
           })
     }
-}
- 
-  async seedDatabase() {
-    const token = await authService.getAccessToken();
-    await fetch('database', {
-        method: 'PUT',
-        headers: !token ?
-            {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-    })
-    this.fetchQuizData()
+    else{
+      this.setState({
+        renderMethod: <p>no questions</p>
+      })
+    }
 }
 
   renderForbidden() {
