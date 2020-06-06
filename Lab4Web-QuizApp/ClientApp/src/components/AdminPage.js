@@ -94,7 +94,7 @@ class AdminPage extends Component {
     }
     else{
       this.setState({
-        renderMethod: <p>no questions</p>
+        renderMethod: <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion", null)} >New question</button>
       })
     }
 }

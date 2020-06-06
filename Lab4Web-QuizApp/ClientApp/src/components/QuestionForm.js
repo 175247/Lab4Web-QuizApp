@@ -36,7 +36,7 @@ export default class QuestionForm extends Component {
     };
     render() {
         let submitButton = <Button className="btn btn-primary" primary>Submit question</Button>
-        if (this.props.option === "newQuestion") {
+        if (this.props.option === "edit") {
             submitButton = <Button className="btn btn-primary" primary>Submit changes</Button>
         }
         const { data, errors } = this.state;
