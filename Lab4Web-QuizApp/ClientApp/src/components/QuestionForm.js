@@ -35,7 +35,6 @@ export default class QuestionForm extends Component {
         this.onSubmit = this.onSubmit.bind(this);
     };
     render() {
-        console.log(this.props.questionData)
         let submitButton = <Button className="btn btn-primary" primary>Submit question</Button>
         if (this.props.option === "newQuestion") {
             submitButton = <Button className="btn btn-primary" primary>Submit changes</Button>

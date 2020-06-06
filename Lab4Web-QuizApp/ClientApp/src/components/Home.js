@@ -56,7 +56,6 @@ export class Home extends Component {
         const { isDatabaseSeeded, isAdminSeeded, token } = this.state
         if (isDatabaseSeeded === false) {
             const result = await apiCalls.genericFetch("database", "PUT", token)
-            console.log(result)
             this.setState({ seedStatus: result.description })
         }
         if (isAdminSeeded === false) {
