@@ -4,6 +4,7 @@ import authService from './api-authorization/AuthorizeService'
 import DeleteQuestion from './DeleteQuestion'
 import QuestionForm from './QuestionForm'
 import QuestionList from './QuestionList'
+import apiCalls from '../helpers/ajaxCalls'
 
 class AdminPage extends Component {
   constructor(props) {
@@ -64,71 +65,34 @@ class AdminPage extends Component {
       user: user,
       token: token
     });
-    if (this.state.user === null) {
-      return(<></>)
-    }
   }
 
   async checkUserRole() {
     await this.getUserData();
-    const { token, user } = this.state;
-
-    if (user == null) {
-      return(
-        <p>Login to continue.</p>
-      )
-    }
-
-    if (user != null) {
-      await fetch('database', {
-        method: 'GET',
-        headers: !token ?
-          {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-        //body: JSON.stringify(user.sub)
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success === true) {
-            this.setState({
-              isUserAnAdmin: true
-            })
-            
-          } else {
-            this.setState({
-              isUserAnAdmin: false
-            })
-          }
+    if (this.state.user != null) {
+      const result = await apiCalls.genericFetch("database", "GET", this.state.token)
+      if (result.success === true) {
+        this.setState({
+          isUserAnAdmin: true
         })
+      }
       this.fetchQuizData();
-      
     }
   }
 
   async fetchQuizData() {
-    //try
-    //{
-      await fetch('questions', {
-        method: 'GET',
-        headers: !this.state.token ?
-        {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' }
-      })
-        .then(response => response.json())
-        .then(data => {
-          this.setState({
-            questionData: data,
+    const result = await apiCalls.genericFetch("questions", "GET", this.state.token)
+    if (result.length > 0) {
+        this.setState({
+            questionData: result,
             isDatabaseSeeded: true,
-            loading: false,
           })
           this.setState({
-          renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
+            renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
           })
-        });
-    //}
-    //catch{
-    //  alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
-    //  this.seedDatabase()
-    //}
-  }
+    }
+}
+ 
   async seedDatabase() {
     const token = await authService.getAccessToken();
     await fetch('database', {
@@ -149,7 +113,6 @@ class AdminPage extends Component {
     await this.checkUserRole();
   }
 
-  
   render() {
     let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderForbidden()
     return (
@@ -158,8 +121,8 @@ class AdminPage extends Component {
       </div>
     );
   }
-
 }
+
 AdminPage.propTypes = {
   submitNewQuestion: PropTypes.func.isRequired,
 };

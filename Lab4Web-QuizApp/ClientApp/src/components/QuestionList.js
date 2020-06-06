@@ -3,11 +3,11 @@ import React from 'react'
 export default function QuestionList(props) {
     const questionData = props.state.questionData;
     let questionList = questionData.map(question => (
-        <li>
+        <li key={question.id}>
             {question.questionString}
             <ol>
                 {question.answerOptions.map(answer =>
-                    <li>{answer.answerString}</li>)}
+                    <li key={answer.id}>{answer.answerString}</li>)}
             </ol>
             <button className="btn btn-primary" onClick={() => props.stateHandler("edit", question)}>Edit</button>
             <button className="btn btn-primary" onClick={() => props.stateHandler("delete", question)}>Delete</button>
