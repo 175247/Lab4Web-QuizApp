@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 
 export class ajaxCalls extends Component {
-
-    //async checkUserRole(token) {
-    //
-    //}
-
     async genericFetch(target, method, token) {
         let resolvedData = "";
 
@@ -16,9 +11,7 @@ export class ajaxCalls extends Component {
         })
             .then(response => response.json())
             .then(data => {
-                //if (data.success === true) {
                 resolvedData = data;
-                //}
             })
             .catch(error => {
                 return error

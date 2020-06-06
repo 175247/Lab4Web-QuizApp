@@ -66,7 +66,6 @@ class ScoreBoard extends Component {
                                     <td>{entrance.dateSubmitted}</td>
                                     <td>{entrance.score}</td>
                                     <td>{entrance.username}</td>
-                                    <td></td>
                                 </tr>
                             ))
                         }
