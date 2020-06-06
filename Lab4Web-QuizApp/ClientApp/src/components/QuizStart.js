@@ -1,6 +1,7 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import authService from './api-authorization/AuthorizeService'
 import Quiz from './Quiz'
+import apiCalls from '../helpers/ajaxCalls'
 
 class QuizStart extends Component {
     constructor() {
@@ -40,81 +41,47 @@ class QuizStart extends Component {
 
     async checkUserRole() {
         await this.getUserData();
-        const { token, user } = this.state;
-
-        if (user != null) {
-            await fetch('database', {
-                method: 'GET',
-                headers: !token ?
-                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success === true) {
-                        this.setState({
-                            isUserAnAdmin: true
-                        })
-                    }
+        if (this.state.user != null) {
+            const result = await apiCalls.genericFetch("database", "GET", this.state.token)
+            if (result.success === true) {
+                this.setState({
+                    isUserAnAdmin: true
                 })
+            }
             this.fetchQuizData();
         }
     }
 
     async fetchQuizData() {
-        const { token } = this.state
-        await fetch('questions', {
-            method: 'GET',
-            headers: !token ?
-                {} : { 'Authorization': `Bearer ${token}`, 'Content-type': 'application/json' }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    this.setState({
-                        questionData: data,
-                        isDatabaseSeeded: true
-                    })
-                }
-            });
+        const result = await Promise.resolve(apiCalls.genericFetch("questions", "GET", this.state.token))
+        if (result.length > 0) {
+            this.setState({
+                questionData: result,
+                isDatabaseSeeded: true
+            })
+        }
     }
 
     async seedDatabase() {
         const { isDatabaseSeeded, isAdminSeeded, token } = this.state
-
         if (isDatabaseSeeded === false) {
-            await fetch('database', {
-                method: 'PUT',
-                headers: !token ?
-                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    this.setState({
-                        seedStatus: data.description
-                    })
-                })
-                .catch(error => {
-                });
+            const result = await Promise.resolve(apiCalls.genericFetch("database", "PUT", token))
+            this.setState({ seedStatus: result.description })
         }
-        // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
+
         if (isAdminSeeded === false) {
-            await fetch('database', {
-                method: 'POST',
-                headers: !token ?
-                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    this.setState({
-                        isAdminSeeded: true
-                    })
-                })
+            const result = await Promise.resolve(apiCalls.genericFetch("database", "POST", token))
+            if (result.success === true) {
+                this.setState({ isAdminSeeded: true })
+            } else {
+                console.log(result.description);
+            }
         }
         this.fetchQuizData()
     }
 
     renderQuiz() {
-        if (this.state.questionData == null) {
+        if (this.state.questionData === null) {
             this.state.renderButtons()
         }
         return (
