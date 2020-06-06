@@ -30,13 +30,11 @@ namespace Lab4Web_QuizApp.Controllers
             _userManager = userManager;
         }
 
-        // GET: api/HighScores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HighScore>>> GetHighScore()
         {
             try
             {
-                //var highScore = await _context.HighScores.Include(u => u.User).ToListAsync();
                 var highScore = await _context.HighScores
                     .OrderByDescending(s => s.Score)
                     .ThenByDescending(d => d.DateSubmitted)
@@ -65,25 +63,9 @@ namespace Lab4Web_QuizApp.Controllers
             }
             catch(Exception exception)
             {
-                return BadRequest(exception.InnerException);
+                return BadRequest(exception.ToString());
             }
         }
-
-        // GET: api/HighScores/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<HighScore>> GetHighScore(int id)
-        {
-            var highScore = await _context.HighScores.FindAsync(id);
-
-            if (highScore == null)
-            {
-                return NotFound();
-            }
-
-            return highScore;
-        }
-
-
 
         [HttpPost]
         public async Task<ActionResult<HighScore>> PostHighScore([FromBody] HighScoreRequest request)
@@ -92,11 +74,16 @@ namespace Lab4Web_QuizApp.Controllers
             {
                 if (request == null)
                 {
-                    return BadRequest();
+                    return BadRequest(new {success = false, message = "Body cannot be empty." });
                 }
                 try
                 {
                     var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+                    if (currentUser == null)
+                    {
+                        return NotFound(new { success = false, message = "User not found." });
+                    }
+
                     var highScore = new HighScore
                     {
                         Score = request.Score,
@@ -119,7 +106,7 @@ namespace Lab4Web_QuizApp.Controllers
                 }
                 catch (Exception exception)
                 {
-                    return BadRequest(exception.InnerException);
+                    return BadRequest(exception.ToString());
                 }
             }
             else
@@ -131,27 +118,5 @@ namespace Lab4Web_QuizApp.Controllers
                 });
             }
         }
-        /*
-                // DELETE: api/HighScores/5
-                [HttpDelete("{id}")]
-                public async Task<ActionResult<HighScore>> DeleteHighScore(int id)
-                {
-                    var highScore = await _context.HighScore.FindAsync(id);
-                    if (highScore == null)
-                    {
-                        return NotFound();
-                    }
-
-                    _context.HighScore.Remove(highScore);
-                    await _context.SaveChangesAsync();
-
-                    return highScore;
-                }
-
-                private bool HighScoreExists(int id)
-                {
-                    return _context.HighScore.Any(e => e.Id == id);
-                }
-        */
     }
 }
