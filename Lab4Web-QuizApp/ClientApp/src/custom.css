@@ -28,3 +28,12 @@ ol{
 body{
   background-color: seagreen;
 }
+
+  .score-table{
+    width: 100%;
+  }
+@media (max-width: 600px) {
+  .score-table{
+    width: 50%;
+  }
+}

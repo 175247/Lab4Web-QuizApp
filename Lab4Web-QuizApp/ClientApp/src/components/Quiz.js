@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import Question from "./Question"
-import ScoreBoard from './ScoreBoard'
 import authService from './api-authorization/AuthorizeService'
 import apiCalls from '../helpers/ajaxCalls'
+import { Link } from "react-router-dom";
 
 class Quiz extends Component {
   constructor(props) {
@@ -14,10 +14,13 @@ class Quiz extends Component {
       token: {},
       user: {},
       isAuthenticated: false,
-      quizComplete: false
+      quizComplete: false,
+      isCorrectAnswer: false,
+      invalidAnswerSelected: false
     }
     this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
-    this.renderScore = this.renderScore.bind(this)
+    this.submitScore = this.submitScore.bind(this)
+    this.resetGame = this.resetGame.bind(this)
   }
 
   componentDidMount() {
@@ -32,8 +35,9 @@ class Quiz extends Component {
       user: user,
       token: token
     });
-
-    await this.fetchQuizData()
+    if (user != null) {
+      await this.fetchQuizData()
+    }
   }
 
   async fetchQuizData() {
@@ -45,14 +49,19 @@ class Quiz extends Component {
     }
   }
 
-  async handleAnswerSelection(selectedAnswer) {
+  handleAnswerSelection(selectedAnswer) {
     if (selectedAnswer.isCorrectAnswer === true) {
-      await this.setState(previousState => ({
-        score: previousState.score + 1
+      this.setState(previousState => ({
+        score: previousState.score + 1,
+        isCorrectAnswer: true,
+        invalidAnswerSelected: false
       }));
+    } else {
+      this.setState({
+        isCorrectAnswer: false,
+        invalidAnswerSelected: true
+      })
     }
-
-    this.loadQuestion();
   }
 
   loadQuestion() {
@@ -60,7 +69,9 @@ class Quiz extends Component {
       this.submitScore();
     } else {
       this.setState(previousState => ({
-        index: previousState.index + 1
+        index: previousState.index + 1,
+        isCorrectAnswer: false,
+        invalidAnswerSelected: false,
       }))
     }
   }
@@ -76,32 +87,80 @@ class Quiz extends Component {
         {} : { 'Authorization': `Bearer ${this.state.token}`, 'Content-type': 'application/json' },
       body: JSON.stringify(scoreData)
     })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          quizComplete: true
+        })
+      })
+      .catch(error => {
+      });
+  }
+
+  renderAnswerSelected() {
+    const { index, questionData, isCorrectAnswer, invalidAnswerSelected } = this.state
+
+    if (isCorrectAnswer && index + 1 === questionData.length) {
+      return (
+        <div>
+          <h2>Correct! You have {this.state.score} points!</h2>
+          <button className="btn btn-success" onClick={() => this.loadQuestion()}>Finalize quiz</button>
+        </div>
+      )
+    }
+    else if (invalidAnswerSelected && index + 1 === questionData.length) {
+      return (
+        <div>
+          <h2>Oops! Looks like it was the wrong answer.</h2>
+          <button className="btn btn-success" onClick={() => this.loadQuestion()}>Finish quiz</button>
+        </div>
+      )
+    }
+    else if (isCorrectAnswer) {
+      return (
+        <div>
+          <h2>Correct! You have {this.state.score} points!</h2>
+          <button className="btn btn-success" onClick={() => this.loadQuestion()}>Next question</button>
+        </div>
+      )
+    }
+    else if (invalidAnswerSelected) {
+      return (
+        <div>
+          <h2>Oops! Looks like it was the wrong answer.</h2>
+          <button className="btn btn-primary" onClick={() => this.loadQuestion()}>Next question</button>
+        </div>
+      )
+    }
+  }
+
+  resetGame() {
     this.setState({
-      quizComplete: true
+      index: 0,
+      score: 0,
+      quizComplete: false,
+      isCorrectAnswer: false,
+      invalidAnswerSelected: false
     })
   }
 
-  renderScore() {
+  renderFinalOptions() {
     let message = null
     this.state.score < 1 ?
       message = `Better luck next time! Score: ${this.state.score}` :
       message = `Well done! You scored a total of ${this.state.score}!`
+
     return (
       <div>
         <h1>{message}</h1>
-        <ScoreBoard
-          user={this.state.user}
-          score={this.state.score}
-        />
+        <button className="btn btn-primary" onClick={() => this.resetGame()}>Play again</button>
+        <Link to="/scoreboard">
+          <button className="btn btn-primary">Go to Scoreboard</button>
+        </Link>
       </div>
     )
   }
 
-  renderForbidden() {
-    return (
-      <p>Please login to proceed.</p>
-    )
-  }
 
   render() {
     let content = null;
@@ -110,19 +169,26 @@ class Quiz extends Component {
 
     if (!this.state.questionData.length > 0) {
       this.fetchQuizData();
-    } else {
-      content = this.state.quizComplete ?
-        this.renderScore() : <Question
+    }
+    else {
+      if (this.state.isCorrectAnswer || this.state.invalidAnswerSelected) {
+        content = null
+      }
+      else {
+        content = <Question
           question={data}
           handler={this.handleAnswerSelection}
         />
+      }
     }
 
-    let allowedOrNot = this.state.isAuthenticated ? content : this.renderForbidden();
+    let allowedOrNot = this.state.isAuthenticated ? content : null
+    let answerContent = this.state.quizComplete ? this.renderFinalOptions() : this.renderAnswerSelected()
 
     return (
       <div>
         {allowedOrNot}
+        {answerContent}
       </div>
     )
   }

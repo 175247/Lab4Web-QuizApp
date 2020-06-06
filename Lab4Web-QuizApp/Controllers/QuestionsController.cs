@@ -19,7 +19,6 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace Lab4Web_QuizApp.Controllers
 {
-    //[Authorize(Roles = "Administrator")]
     [Authorize]
     [Route("questions")]
     [ApiController]
@@ -57,28 +56,18 @@ namespace Lab4Web_QuizApp.Controllers
 
                     if (questions.Count() == 0 || questions == null)
                     {
-                        return NoContent();
+                        return NotFound();
                     }
 
                     var response = GenerateQuestionResponse(questions);
-                    //var response = Enumerable.Range(0, questions.Count())
-                    //    .Select(index => new QuestionResponse
-                    //    {
-                    //        RequestTime = DateTime.Now,
-                    //        Id = questions[index].Id,
-                    //        QuestionString = questions[index].QuestionString,
-                    //        AnswerOptions = questions[index].AnswerOptions
-                    //    })
-                    //.ToArray();
-
                     return Ok(response);
                 }
                 catch (Exception exception)
                 {
-                    return BadRequest(exception.InnerException);
+                    return BadRequest(exception.ToString());
                 }
             }
-            else // Leaving this "else" here for clarity and readability.
+            else
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, new
                 {
@@ -123,32 +112,46 @@ namespace Lab4Web_QuizApp.Controllers
 
                 var response = GenerateQuestionResponse(questions);
 
-                return Ok(response);
+                return Created("/questions", response);
             }
             catch (Exception exception)
             {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
-                {
-                    message = "The database is currently unavailable.",
-                    Description = exception.InnerException
-                });
+                return BadRequest(exception.ToString());
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<Question>> DeleteQuestion(int id)
         {
-            var question = await _context.Questions.FindAsync(id);
-            if (question == null)
+            if (id.GetType() != typeof(int))
             {
-                return NotFound();
+                return BadRequest(new { success = false, message = "Wrong request-format" });
             }
 
-            _context.Questions.Remove(question);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var question = await _context.Questions.FindAsync(id);
+                if (question == null)
+                {
+                    return NotFound();
+                }
 
-            return question;
+                _context.Questions.Remove(question);
+                await _context.SaveChangesAsync();
+
+                return StatusCode(StatusCodes.Status204NoContent, new
+                {
+                    success = true,
+                    message = "Question deleted successfully."
+                });
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.ToString());
+            }
+
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateQuestion([FromBody] Question request, int id)
         {
@@ -170,16 +173,12 @@ namespace Lab4Web_QuizApp.Controllers
             try
             { 
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception exception)
             {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
-                {
-                    message = "The database is currently unavailable.",
-                    Description = exception.InnerException
-                });
+                return BadRequest(exception.ToString());
             }
-            return NoContent();
         }
     }
 }

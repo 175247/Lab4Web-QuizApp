@@ -30,8 +30,8 @@ export class NavMenu extends Component {
     };
   }
 
-  componentDidMount() {
-    this.checkUserRole();
+  async componentDidMount() {
+    await this.checkUserRole();
   }
 
   async getUserData() {
