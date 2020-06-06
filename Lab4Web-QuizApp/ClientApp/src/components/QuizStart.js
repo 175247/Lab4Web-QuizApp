@@ -15,6 +15,7 @@ class QuizStart extends Component {
             token: {},
             isAuthenticated: false,
             isUserAnAdmin: false,
+            isAdminSeeded: false,
             user: {}
         }
         this.fetchQuizData = this.fetchQuizData.bind(this)
@@ -24,7 +25,6 @@ class QuizStart extends Component {
     }
 
     componentDidMount() {
-        //this.getUserData();
         this.checkUserRole();
     }
 
@@ -40,20 +40,17 @@ class QuizStart extends Component {
 
     async checkUserRole() {
         await this.getUserData();
-        //const token = await authService.getAccessToken();
-        //const userId = this.state.user.sub
         const { token, user } = this.state;
 
         if (user != null) {
             await fetch('database', {
-                method: 'POST',
+                method: 'GET',
                 headers: !token ?
-                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(user.sub)
+                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success === true) {
                         this.setState({
                             isUserAnAdmin: true
                         })
@@ -64,7 +61,7 @@ class QuizStart extends Component {
     }
 
     async fetchQuizData() {
-        const token = await authService.getAccessToken();
+        const { token } = this.state
         await fetch('questions', {
             method: 'GET',
             headers: !token ?
@@ -75,39 +72,44 @@ class QuizStart extends Component {
                 if (data.length > 0) {
                     this.setState({
                         questionData: data,
-                        isDatabaseSeeded: true,
+                        isDatabaseSeeded: true
                     })
                 }
             });
     }
 
     async seedDatabase() {
-        const token = await authService.getAccessToken();
-        await fetch('database', {
-            method: 'PUT',
-            headers: !token ?
-                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    seedStatus: data.description
-                })
-            })
-        //.catch(error => {
-        //    console.log(error)
-        //});
-        // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
-        await fetch('database', {
-            method: 'POST',
-            headers: !token ?
-                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-            })
+        const { isDatabaseSeeded, isAdminSeeded, token } = this.state
 
+        if (isDatabaseSeeded === false) {
+            await fetch('database', {
+                method: 'PUT',
+                headers: !token ?
+                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({
+                        seedStatus: data.description
+                    })
+                })
+                .catch(error => {
+                });
+        }
+        // This is for seeding the admin (empty body). If "non-empty body required" appears, comment out the "checkUserRole" function.
+        if (isAdminSeeded === false) {
+            await fetch('database', {
+                method: 'POST',
+                headers: !token ?
+                    {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({
+                        isAdminSeeded: true
+                    })
+                })
+        }
         this.fetchQuizData()
     }
 

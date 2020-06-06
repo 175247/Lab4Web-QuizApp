@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { LoginMenu } from "./api-authorization/LoginMenu";
 import "./NavMenu.css";
 import authService from './api-authorization/AuthorizeService'
-import AdminPage from "./AdminPage";
+//import AdminPage from "./AdminPage";
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -166,7 +166,9 @@ export class NavMenu extends Component {
 
 
   render() {
-    const { isAuthenticated, isUserAnAdmin } = this.state
+    //const { isAuthenticated, isUserAnAdmin } = this.state
+    const { isUserAnAdmin } = this.state
+
 
     //let isLoggedInCheck = isAuthenticated ? this.checkUserRole() : this.renderNavbarNormal()
     let content = isUserAnAdmin ? this.renderNavbarAdmin() : this.renderNavbarNormal()
