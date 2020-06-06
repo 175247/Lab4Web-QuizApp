@@ -1,9 +1,7 @@
 import React, { Component } from "react"
 import Question from "./Question"
-import ScoreBoard from './ScoreBoard'
 import authService from './api-authorization/AuthorizeService'
 import apiCalls from '../helpers/ajaxCalls'
-import AuthorizeRoute from "./api-authorization/AuthorizeRoute"
 import { Link } from "react-router-dom";
 
 class Quiz extends Component {
@@ -21,7 +19,6 @@ class Quiz extends Component {
       invalidAnswerSelected: false
     }
     this.handleAnswerSelection = this.handleAnswerSelection.bind(this)
-    //this.renderScore = this.renderScore.bind(this)
     this.submitScore = this.submitScore.bind(this)
     this.resetGame = this.resetGame.bind(this)
   }
@@ -38,8 +35,9 @@ class Quiz extends Component {
       user: user,
       token: token
     });
-
-    await this.fetchQuizData()
+    if (user != null) {
+      await this.fetchQuizData()
+    }
   }
 
   async fetchQuizData() {
@@ -64,21 +62,16 @@ class Quiz extends Component {
         invalidAnswerSelected: true
       })
     }
-
-    //this.loadQuestion();
   }
 
   loadQuestion() {
     if (this.state.index === this.state.questionData.length - 1) {
       this.submitScore();
-      //this.setState({
-      //  quizComplete: true
-      //})
     } else {
       this.setState(previousState => ({
         index: previousState.index + 1,
         isCorrectAnswer: false,
-        invalidAnswerSelected: false
+        invalidAnswerSelected: false,
       }))
     }
   }
@@ -101,12 +94,12 @@ class Quiz extends Component {
         })
       })
       .catch(error => {
-
       });
   }
 
   renderAnswerSelected() {
     const { index, questionData, isCorrectAnswer, invalidAnswerSelected } = this.state
+
     if (isCorrectAnswer && index + 1 === questionData.length) {
       return (
         <div>
@@ -150,6 +143,7 @@ class Quiz extends Component {
       invalidAnswerSelected: false
     })
   }
+
   renderFinalOptions() {
     let message = null
     this.state.score < 1 ?
@@ -164,7 +158,6 @@ class Quiz extends Component {
           <button className="btn btn-primary">Go to Scoreboard</button>
         </Link>
       </div>
-      //<button onClick={() => this.renderScore()}>Go to scoreboard</button>
     )
   }
 
@@ -176,17 +169,21 @@ class Quiz extends Component {
 
     if (!this.state.questionData.length > 0) {
       this.fetchQuizData();
-    } else {
-      content = this.state.quizComplete ?
-        this.renderFinalOptions() : <Question
+    }
+    else {
+      if (this.state.isCorrectAnswer) {
+        content = null
+      }
+      else {
+        content = <Question
           question={data}
           handler={this.handleAnswerSelection}
         />
+      }
     }
-    //this.renderScore() : <Question
 
     let allowedOrNot = this.state.isAuthenticated ? content : null
-    let answerContent = this.state.quizComplete ? null : this.renderAnswerSelected()
+    let answerContent = this.state.quizComplete ? this.renderFinalOptions() : this.renderAnswerSelected()
 
     return (
       <div>
