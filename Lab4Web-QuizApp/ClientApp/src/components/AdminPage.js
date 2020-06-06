@@ -5,6 +5,7 @@ import InlineError from "./InlineError";
 import authService from './api-authorization/AuthorizeService'
 import DeleteQuestion from './DeleteQuestion'
 import QuestionForm from './QuestionForm'
+import QuestionList from './QuestionList'
 
 class AdminPage extends Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class AdminPage extends Component {
         answer3: "",
         correctAnswer: "",
       },
-      loading: false,
+      loading: true,
       errors: {},
       questionData: [],
       isDatabaseSeeded: false,
@@ -27,25 +28,24 @@ class AdminPage extends Component {
       isUserAnAdmin: false,
       user: {},
       chosenQuestion: {},
+      renderMethod: [],
     };
     this.fetchQuizData = this.fetchQuizData.bind(this);
-    this.resetPage = this.resetPage.bind(this);
+    this.stateHandler = this.stateHandler.bind(this);
   }
 
-  async resetPage ()  {
-    this.setState({
-      renderOption: "list",
-      data: {},
-      errors: {}
-    })
-    await this.fetchQuizData();
-  };
+  //async resetPage ()  {
+  //  this.setState({
+  //    renderOption: "list",
+  //    data: "",
+  //    errors: {},
+  //    renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
+  //  })
+  //  await this.fetchQuizData();
+  //};
 
-  stateHandler = (option, questionData) => {
-    this.setState({
-      renderOption: option,
-    })
-    if(questionData === null) return
+  async stateHandler(option, questionData) {
+    if(questionData){
     this.setState(prevState => {
       let data = { ...prevState.data };
       data.question = questionData.questionString;
@@ -53,10 +53,26 @@ class AdminPage extends Component {
       data.answer2 = questionData.answerOptions[1].answerString;
       data.answer3 = questionData.answerOptions[2].answerString;
       return { data };
-    })
+    })}
     this.setState({
       chosenQuestion: questionData,
     })
+    if (option === "delete") {
+      this.setState({
+        renderMethod:<DeleteQuestion question={questionData} stateHandler={this.stateHandler}/>
+      })
+    }
+    else if(option === "list"){
+      this.setState({
+        renderMethod:<QuestionList state={this.state} stateHandler={this.stateHandler}/>
+      })
+      await this.fetchQuizData();
+    }
+    else {
+      this.setState({
+        renderMethod:<QuestionForm questionData={questionData} option={option} stateHandler={this.stateHandler}/>
+      })
+    }
   }
   async getUserData() {
     const token = await authService.getAccessToken();
@@ -104,13 +120,16 @@ class AdminPage extends Component {
           this.setState({
             questionData: data,
             isDatabaseSeeded: true,
+            loading: false,
+          })
+          this.setState({
+          renderMethod: <QuestionList state={this.state} stateHandler={this.stateHandler}/>
           })
         });
     }
     catch(e){
       console.log(e)
-      alert("Database emptied, seeded database again. If you want to remove all the seeded questions then you need to add another one first")
-      this.seedDatabase()
+      alert(e)
     }
   }
   async seedDatabase() {
@@ -123,119 +142,13 @@ class AdminPage extends Component {
     this.fetchQuizData()
 }
 
-  renderQuestionForm() {
-    let submitButton =  <Button  className="btn btn-primary" primary>Submit question</Button>
-    if (this.state.renderOption === "edit") {
-      submitButton =  <Button  className="btn btn-primary" primary>Submit changes</Button>
-    }
-    const { data, errors } = this.state;
-    return (
-      <Form onSubmit={()=> this.onSubmit()} id="main-form">
-        <Form.Field error={!!errors.question}>
-          <label htmlFor="question">Question:</label>
-          <br />
-          <input
-            type="text"
-            id="question"
-            name="question"
-            value={data.question}
-            onChange={this.onChangeHandler}
-          />
-          {errors.question && <InlineError text={errors.question} />}
-        </Form.Field>
-        <Form.Field error={!!errors.answer1}>
-          <label htmlFor="answer1">Answer 1:</label>
-          <br />
-          <input
-            type="text"
-            id="answer1"
-            name="answer1"
-            value={data.answer1}
-            onChange={this.onChangeHandler}
-          />
-          <input
-            type="radio"
-            id="answer1radio"
-            name="correctAnswer"
-            value="answer1"
-            onChange={this.onChangeHandler}
-          />
-          {errors.answer1 && <InlineError text={errors.answer1} />}
-        </Form.Field>
-        <Form.Field error={!!errors.answer2}>
-          <label htmlFor="answer2">Answer 2:</label>
-          <br />
-          <input
-            type="text"
-            id="answer2"
-            name="answer2"
-            value={data.answer2}
-            onChange={this.onChangeHandler}
-          />
-          <input
-            type="radio"
-            id="answer2radio"
-            name="correctAnswer"
-            value="answer2"
-            onChange={this.onChangeHandler}
-          />
-          {errors.answer2 && <InlineError text={errors.answer2} />}
-        </Form.Field>
-        <Form.Field error={!!errors.answer3}>
-          <label htmlFor="answer3">Answer 3:</label>
-          <br />
-          <input
-            type="text"
-            id="answer3"
-            name="answer3"
-            value={data.answer3}
-            onChange={this.onChangeHandler}
-          />
-          <input
-            type="radio"
-            id="answer3radio"
-            name="correctAnswer"
-            value="answer3"
-            onChange={this.onChangeHandler}
-          />
-          {errors.answer3 && <InlineError text={errors.answer3} />}
-        </Form.Field>
-        {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
-        <br />
-        {submitButton}
-        <button  className="btn btn-primary" onClick={this.resetPage}>Back to the list</button>
-      </Form>
-    );
-  }
-
-  renderQuestionList() {
-    if (!this.state.isDatabaseSeeded) {
-      this.fetchQuizData();
-    }
-    const questionData = this.state.questionData;
-    let questionList = questionData.map(question => (
-      <li>
-        {question.questionString}
-        <ol>
-          {question.answerOptions.map(answer =>
-            <li>{answer.answerString}</li>)}
-        </ol>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("edit", question)}>Edit</button>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("delete", question)}>Delete</button>
-      </li>
-    ))
-    return (
-      <ol>
-        <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion", null)} >New question</button>
-        {questionList}
-      </ol>
-    )
-  }
-
-  renderAdmin() {
+  async renderAdmin() {
     switch (this.state.renderOption) {
       case "list":
-        return (this.renderQuestionList())
+        return<ol>
+            <button className="btn btn-primary" onClick={() => this.stateHandler("newQuestion", null)} >New question</button>
+            <QuestionList state={this.state} stateHandler={this.stateHandler} />
+        </ol>
       case "delete":
         let question = this.state.questionData.find(question => question.id === this.state.chosenQuestion.id)
         return <DeleteQuestion question={question} resetPage={this.resetPage}/>
@@ -250,15 +163,18 @@ class AdminPage extends Component {
     )
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.getUserData();
+    await this.fetchQuizData();
   }
 
   render() {
     let adminCheckResult = this.state.isUserAnAdmin ? this.renderAdmin() : this.renderNormalUser()
+    let contents = this.state.loading
+      ? <p><em>Loading...</em></p>: this.state.renderMethod
     return (
       <div>
-        {adminCheckResult}
+        {contents}
       </div>
     );
   }

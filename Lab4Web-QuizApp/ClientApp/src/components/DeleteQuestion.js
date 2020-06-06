@@ -14,7 +14,7 @@ export default function DeleteQuestion(props) {
                 <br />
                 <button className="btn btn-primary" onClick={() => deleteQuestion()}>Delete</button>
             </ol>
-            <button className="btn btn-primary" onClick={props.resetPage}>Back to the list</button>
+            <button className="btn btn-primary" onClick={() => props.stateHandler("list", null)}>Back to the list</button>
         </div>
 
     )
@@ -25,6 +25,6 @@ export default function DeleteQuestion(props) {
                 'Content-type': 'application/json; charset=UTF-8'
             },
         })
-        await props.resetPage();
+        await props.stateHandler("list", null);
     }
 }

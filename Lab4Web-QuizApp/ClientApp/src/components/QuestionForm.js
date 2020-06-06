@@ -7,14 +7,37 @@ import SubmitQuestionChanges from './SubmitQuestionChanges'
 export default class QuestionForm extends Component {
     constructor(props) {
         super(props);
-        this.state = props.state;
+        let questionData = props.questionData;
+        if (questionData) {
+            this.state = {
+                data: {
+                    question: questionData.questionString,
+                    answer1: questionData.answerOptions[0].answerString,
+                    answer2: questionData.answerOptions[1].answerString,
+                    answer3: questionData.answerOptions[2].answerString,
+                },
+                errors: {},
+            }
+        }
+        else {
+            this.state = {
+                data: {
+                    question: "",
+                    answer1: "",
+                    answer2: "",
+                    answer3: "",
+                    correctAnswer: "",
+                },
+                errors: {},
+            }
+        }
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-
     };
     render() {
+        console.log(this.props.questionData)
         let submitButton = <Button className="btn btn-primary" primary>Submit question</Button>
-        if (this.state.renderOption === "edit") {
+        if (this.props.option === "newQuestion") {
             submitButton = <Button className="btn btn-primary" primary>Submit changes</Button>
         }
         const { data, errors } = this.state;
@@ -92,7 +115,7 @@ export default class QuestionForm extends Component {
                 {errors.correctAnswer && <InlineError text={errors.correctAnswer} />}
                 <br />
                 {submitButton}
-                <button className="btn btn-primary" >Back to the list</button>
+                <button className="btn btn-primary" onClick={() => this.props.stateHandler("list")}>Back to the list</button>
             </Form>
         );
     }
@@ -106,13 +129,13 @@ export default class QuestionForm extends Component {
         const errors = this.validate(this.state.data);
         this.setState({ errors });
         if (Object.keys(errors).length === 0) {
-            if (this.state.renderOption === "newQuestion") {
+            if (this.props.option === "newQuestion") {
                 await SubmitNewQuestion(this.state.data);
             }
             else {
-                await SubmitQuestionChanges(this.state.data, this.state.chosenQuestion);
+                await SubmitQuestionChanges(this.state.data, this.props.questionData);
             }
-            await this.props.resetPage();
+            await this.props.stateHandler("list");
         }
     };
     validate = (data) => {
