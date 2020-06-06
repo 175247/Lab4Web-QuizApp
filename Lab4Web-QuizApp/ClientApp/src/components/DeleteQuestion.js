@@ -3,7 +3,6 @@ import authService from './api-authorization/AuthorizeService'
 
 export default function DeleteQuestion(props) {
     const question = props.question;
-    console.log(question)
     return (
         <div>
             <p>Question: {question.questionString}</p>

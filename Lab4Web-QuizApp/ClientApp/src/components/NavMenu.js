@@ -14,9 +14,9 @@ import "./NavMenu.css";
 import authService from './api-authorization/AuthorizeService'
 import apiCalls from '../helpers/ajaxCalls'
 
+
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
-
   constructor(props) {
     super(props);
 
@@ -30,8 +30,8 @@ export class NavMenu extends Component {
     };
   }
 
-  componentDidMount() {
-    this.checkUserRole();
+  async componentDidMount() {
+    await this.checkUserRole();
   }
 
   async getUserData() {
@@ -81,17 +81,17 @@ export class NavMenu extends Component {
             >
               <ul className="navbar-nav flex-grow">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">
+                  <NavLink tag={Link} className="basicNavlink" to="/">
                     Home
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                  <NavLink tag={Link} className="basicNavlink" to="/quiz-start">
                     Quiz
                   </NavLink>
                 </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                <NavItem className="basicNavlink">
+                  <NavLink tag={Link} className="basicNavlink" to="/scoreboard">
                     Scoreboard
                   </NavLink>
                 </NavItem>
@@ -112,8 +112,8 @@ export class NavMenu extends Component {
           light
         >
           <Container>
-            <NavbarBrand tag={Link} to="/">
-              Lab4Web_QuizApp
+            <NavbarBrand className="basicNavlink" tag={Link} to="/">
+              Quiz!
           </NavbarBrand>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse
@@ -121,32 +121,32 @@ export class NavMenu extends Component {
               isOpen={!this.state.collapsed}
               navbar
             >
-              <ul className="navbar-nav flex-grow">
+              <ul className="flex-grow basicNavlink navbar-nav">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">
+                  <NavLink tag={Link} className="basicNavlink" to="/">
                     Home
                 </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/quiz-start">
+                  <NavLink tag={Link} className="basicNavlink" to="/quiz-start">
                     Quiz
                   </NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/scoreboard">
+                  <NavLink tag={Link} className="basicNavlink" to="/scoreboard">
                     Scoreboard
                   </NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink
                     tag={Link}
-                    className="text-dark"
+                    className="basicNavlink"
                     to="/admin-page"
                   >
                     AdminPage
                 </NavLink>
                 </NavItem>
-                <LoginMenu></LoginMenu>
+                <LoginMenu className="basicNavlink"></LoginMenu>
               </ul>
             </Collapse>
           </Container>
