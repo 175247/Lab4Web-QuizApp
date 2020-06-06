@@ -71,7 +71,6 @@ class AdminPage extends Component {
 
   async checkUserRole() {
     await this.getUserData();
-    await this.fetchQuizData()
     const { token, user } = this.state;
 
     if (user == null) {
@@ -93,6 +92,7 @@ class AdminPage extends Component {
             this.setState({
               isUserAnAdmin: true
             })
+            
           } else {
             this.setState({
               isUserAnAdmin: false
@@ -144,19 +144,16 @@ class AdminPage extends Component {
     )
   }
 
-  componentDidMount() {
-    this.getUserData();
+  async componentDidMount() {
+    await this.checkUserRole();
   }
 
   
   render() {
     let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderForbidden()
-    let contents = this.state.loading
-      ? <p><em>Loading...</em></p>: adminCheckResult
-
     return (
       <div>
-        {contents}
+        {adminCheckResult}
       </div>
     );
   }

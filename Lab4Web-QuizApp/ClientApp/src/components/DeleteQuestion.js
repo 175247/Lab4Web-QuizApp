@@ -1,4 +1,5 @@
 import React from 'react'
+import authService from './api-authorization/AuthorizeService'
 
 export default function DeleteQuestion(props) {
     const question = props.question;
@@ -19,11 +20,12 @@ export default function DeleteQuestion(props) {
 
     )
     async function deleteQuestion() {
+        const token = await authService.getAccessToken();
         await fetch('questions/' + question.id, {
             method: 'DELETE',
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8'
-            },
+            headers: !token ?
+                {} : { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` }
+
         })
         await props.stateHandler("list", null);
     }
