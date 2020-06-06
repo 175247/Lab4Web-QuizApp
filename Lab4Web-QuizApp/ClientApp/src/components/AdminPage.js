@@ -100,6 +100,7 @@ class AdminPage extends Component {
           }
         })
       this.fetchQuizData();
+      
     }
   }
 
