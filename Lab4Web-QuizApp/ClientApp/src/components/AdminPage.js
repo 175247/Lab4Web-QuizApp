@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import { Form, Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import InlineError from "./InlineError";
 import authService from './api-authorization/AuthorizeService'
 import DeleteQuestion from './DeleteQuestion'
 import QuestionForm from './QuestionForm'
@@ -73,6 +71,7 @@ class AdminPage extends Component {
 
   async checkUserRole() {
     await this.getUserData();
+    await this.fetchQuizData()
     const { token, user } = this.state;
 
     if (user == null) {
@@ -145,14 +144,13 @@ class AdminPage extends Component {
     )
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this.getUserData();
-    await this.fetchQuizData();
   }
 
   
   render() {
-    let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderNormalUser()
+    let adminCheckResult = this.state.isUserAnAdmin ? this.state.renderMethod : this.renderForbidden()
     let contents = this.state.loading
       ? <p><em>Loading...</em></p>: adminCheckResult
 
