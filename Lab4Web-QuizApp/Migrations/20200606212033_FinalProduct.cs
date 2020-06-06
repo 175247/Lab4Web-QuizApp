@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Lab4Web_QuizApp.Migrations
 {
-    public partial class MergeLunaTo5Jue : Migration
+    public partial class FinalProduct : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -206,7 +206,7 @@ namespace Lab4Web_QuizApp.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Score = table.Column<int>(nullable: false),
-                    DateSubmitted = table.Column<string>(nullable: true),
+                    DateSubmitted = table.Column<DateTime>(nullable: false),
                     Username = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: true)
                 },
@@ -245,7 +245,7 @@ namespace Lab4Web_QuizApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "6ebe2fae-666e-4cd6-982f-714b217d74e7", "04705cb5-7b76-4d25-9abd-d139cea3b86f", "Administrator", "ADMINISTRATOR" });
+                values: new object[] { "58a0b225-91ec-4050-988b-ea22b6e2f724", "e9bdd2eb-343d-4f78-b4c8-452e7ca69a99", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",

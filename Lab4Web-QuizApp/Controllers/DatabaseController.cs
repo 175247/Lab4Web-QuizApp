@@ -74,6 +74,7 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> SeedAdmin()
         {
@@ -119,6 +120,7 @@ namespace Lab4Web_QuizApp.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> SeedDatabase()
         {

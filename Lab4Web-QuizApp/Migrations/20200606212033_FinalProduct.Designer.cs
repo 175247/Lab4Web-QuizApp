@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab4Web_QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200605232315_ChangedHighScoreDateType")]
-    partial class ChangedHighScoreDateType
+    [Migration("20200606212033_FinalProduct")]
+    partial class FinalProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -261,8 +261,8 @@ namespace Lab4Web_QuizApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "24f3c6b5-ba28-4bd9-8103-3c42c8f12f89",
-                            ConcurrencyStamp = "f459ba67-0919-465c-85eb-750f990045ee",
+                            Id = "58a0b225-91ec-4050-988b-ea22b6e2f724",
+                            ConcurrencyStamp = "e9bdd2eb-343d-4f78-b4c8-452e7ca69a99",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
