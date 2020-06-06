@@ -38,7 +38,11 @@ namespace Lab4Web_QuizApp.Controllers
         {
             if (User == null)
             {
-                return BadRequest();
+                return BadRequest(new 
+                { 
+                    success = false, 
+                    message = "RoleCheck failed as User is null, login to proceed." 
+                });
             }
         
             try
